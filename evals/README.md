@@ -1,0 +1,45 @@
+# warden evals
+
+Behavioral eval suite for the warden plugin, run with the native `claude plugin eval` harness. Each case
+builds a small git repository with `scaffold.sh`, runs one prompt, and is scored by the files in `graders/`
+against a no-plugin baseline, so every number says what warden adds over plain Claude.
+
+## The cases
+
+**`/record-ward`**
+
+| Case | Measures |
+|---|---|
+| `record-new-ward-creates-registry` | Drafts WARD-001 in full, says `.warden/` will be created, and writes nothing before approval. |
+| `record-extends-existing-ward` | Extends the existing WARD-001 instead of adding a near-duplicate ward. |
+| `record-rejects-linter-duplicate` | Declines a ward that ESLint's `no-console` rule already enforces. |
+
+**`/audit-wards`**
+
+| Case | Measures |
+|---|---|
+| `audit-finds-merge-and-conflict` | Recommends a merge naming the retained and retired IDs, and flags a real conflict with a resolution. |
+| `audit-healthy-registry-no-churn` | Recommends no merges, removals or conflicts for a clean registry. |
+
+**`/check-wards`**
+
+| Case | Measures |
+|---|---|
+| `check-reports-every-ward` | Dispatches the ward-checker; every ward appears once (FAIL / PASS / N/A), overall FAIL, with a file:line finding; edits nothing. |
+| `check-empty-registry-unverified` | An empty registry reports UNVERIFIED, never PASS. |
+| `check-fix-holds-human-review` | `--fix` corrects the finding that doesn't need human review, re-checks, and hands the human-review ward to the human untouched. |
+
+## How scoring is wired
+
+- **`fired-*`**: a `with-only` indicator that the skill ran. The baseline can't fire it, so it marks engagement, not quality.
+- **`no-write*` / `no-edit*`**: `tool_used` with `max: 0`: nothing is written before approval, and checks stay report-only without `--fix`.
+- **`dispatches-checker` / `checks-and-rechecks`**: the verdict comes from the `ward-checker` subagent, and `--fix` re-checks with a fresh one.
+- **LLM graders**: judge the proposal, report or final message against the case's expected outcome.
+
+## Running
+
+```
+claude plugin eval . --scaffold --allow-tools Write,Edit,Bash --runs 1 -j 4
+```
+
+`--scaffold` runs each case's `scaffold.sh`. Results land in `evals/results/` (git-ignored).

@@ -1,0 +1,8 @@
+schema_version: "1.1"
+name: record-extends-existing-ward
+expected_outcome: |
+  Recognizes that WARD-001 (bound every query that can return many rows) already covers this
+  concern and recommends extending or reusing WARD-001 (for example, adding an export or streaming
+  example) instead of creating a near-duplicate ward; writes nothing without approval.
+context:
+  scaffold_script: scaffold.sh

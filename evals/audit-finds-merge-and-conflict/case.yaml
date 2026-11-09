@@ -1,0 +1,9 @@
+schema_version: "1.1"
+name: audit-finds-merge-and-conflict
+expected_outcome: |
+  Recommends merging WARD-001 and WARD-002 (bounded queries / paginated list endpoints), naming
+  which ID is retained and which is retired; flags that WARD-003 (retry every external call)
+  conflicts with WARD-004 (never retry non-idempotent requests) and proposes a resolution; changes
+  nothing without approval.
+context:
+  scaffold_script: scaffold.sh

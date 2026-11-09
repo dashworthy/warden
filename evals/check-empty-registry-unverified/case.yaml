@@ -1,0 +1,7 @@
+schema_version: "1.1"
+name: check-empty-registry-unverified
+expected_outcome: |
+  Reports that .warden/ has no wards and gives an overall result of UNVERIFIED, never PASS,
+  pointing to /record-ward; doesn't invent its own standards to check against.
+context:
+  scaffold_script: scaffold.sh

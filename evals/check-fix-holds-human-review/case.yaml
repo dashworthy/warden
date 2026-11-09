@@ -1,0 +1,9 @@
+schema_version: "1.1"
+name: check-fix-holds-human-review
+expected_outcome: |
+  Dispatches the ward-checker, auto-fixes the WARD-001 finding (unbounded query in
+  src/handlers/invoices.ts) and re-checks with a fresh checker, but does not edit
+  src/ui/BulkDeleteInvoices.tsx: WARD-002 requires human review, so its finding and question are
+  handed to the human in the final message along with the list of corrections applied.
+context:
+  scaffold_script: scaffold.sh

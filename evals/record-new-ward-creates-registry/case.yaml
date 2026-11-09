@@ -1,0 +1,9 @@
+schema_version: "1.1"
+name: record-new-ward-creates-registry
+expected_outcome: |
+  Proposes WARD-001 (a ward about bounding or paginating collection queries) with every field,
+  explicit PASS and FAIL conditions and a human-review setting, says .warden/ (the index and
+  .warden/wards/WARD-001.md) will be created on approval, and stops for approval without writing
+  any file.
+context:
+  scaffold_script: scaffold.sh

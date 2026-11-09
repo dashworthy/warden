@@ -1,0 +1,22 @@
+{
+  "name": "warden",
+  "owner": {
+    "name": "Andrew Leach",
+    "email": "7387639+andyleach@users.noreply.github.com"
+  },
+  "metadata": {
+    "description": "warden plugin marketplace"
+  },
+  "plugins": [
+    {
+      "name": "warden",
+      "source": "./",
+      "description": "Record, audit and enforce your repository's own engineering standards (wards), with an independent read-only checker for every slice.",
+      "version": "0.1.0",
+      "author": {
+        "name": "Andrew Leach",
+        "email": "7387639+andyleach@users.noreply.github.com"
+      }
+    }
+  ]
+}

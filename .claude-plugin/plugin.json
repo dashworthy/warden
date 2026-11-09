@@ -1,0 +1,20 @@
+{
+  "name": "warden",
+  "version": "0.1.0",
+  "description": "Record, audit and enforce your repository's own engineering standards. Each standard is a ward: /record-ward adds one after approval, /audit-wards consolidates them, and /check-wards verifies every implementation slice through an independent, read-only checker.",
+  "author": {
+    "name": "Andrew Leach",
+    "email": "7387639+andyleach@users.noreply.github.com"
+  },
+  "homepage": "https://github.com/dashworthy/warden",
+  "repository": "https://github.com/dashworthy/warden",
+  "license": "MIT",
+  "keywords": [
+    "code-quality",
+    "engineering-standards",
+    "review",
+    "wards",
+    "subagents",
+    "slices"
+  ]
+}

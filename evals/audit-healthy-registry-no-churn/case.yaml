@@ -1,0 +1,7 @@
+schema_version: "1.1"
+name: audit-healthy-registry-no-churn
+expected_outcome: |
+  Finds two distinct, well-formed wards, recommends no merges, removals or conflicts (minor
+  wording suggestions at most), and changes nothing.
+context:
+  scaffold_script: scaffold.sh

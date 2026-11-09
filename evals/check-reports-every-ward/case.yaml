@@ -1,0 +1,9 @@
+schema_version: "1.1"
+name: check-reports-every-ward
+expected_outcome: |
+  Dispatches the warden ward-checker; the report's summary table lists WARD-001 FAIL (unbounded
+  findMany in src/handlers/invoices.ts), WARD-002 PASS (input parsed with zod) and WARD-003 N/A
+  (no migrations), each exactly once, with totals and an overall FAIL, plus a finding that cites
+  the file and line and recommends bounding the query. Edits nothing.
+context:
+  scaffold_script: scaffold.sh
