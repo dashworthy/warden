@@ -19,8 +19,12 @@ cat > src/db.ts <<'__WARDEN_EOF__'
 // Thin wrapper over the ORM client; models expose findMany / findUnique / create / deleteMany.
 export { prisma as db } from './prisma'
 __WARDEN_EOF__
-mkdir -p .warden/wards
-cat > .warden/wards/WARD-001.md <<'__WARDEN_EOF__'
+mkdir -p .warden
+cat > .warden/.ignore <<'__WARDEN_EOF__'
+wards/*/examples/
+__WARDEN_EOF__
+mkdir -p .warden/wards/WARD-001
+cat > .warden/wards/WARD-001/ward.md <<'__WARDEN_EOF__'
 # WARD-001: Bound every query that can return many rows
 
 **Description:** List and export queries that load every matching row exhaust memory and time out as data grows.
@@ -53,8 +57,43 @@ const orders = await db.order.findMany({ where: { accountId }, take: limit, skip
 
 **Human review:** Not required
 __WARDEN_EOF__
-mkdir -p .warden/wards
-cat > .warden/wards/WARD-002.md <<'__WARDEN_EOF__'
+mkdir -p .warden/wards/WARD-001/examples
+cat > .warden/wards/WARD-001/examples/overdue-payments-report.md <<'__WARDEN_EOF__'
+# Overdue payments report
+
+## Sample
+
+```ts
+// src/reports/overdue.ts (excerpt)
+export async function overduePayments(now: Date) {
+  const payments = await db.payment.findMany({ where: { dueAt: { lt: now }, paidAt: null } })
+  return payments.map(toReportRow)
+}
+```
+
+## Expected fix shape
+
+- The query is bounded: `take`/`skip`, a cursor, or processing in fixed-size batches.
+- The filter and the report rows stay the same.
+
+```ts
+export async function* overduePayments(now: Date) {
+  let cursor: string | undefined
+  do {
+    const batch = await db.payment.findMany({
+      where: { dueAt: { lt: now }, paidAt: null },
+      take: 500,
+      ...(cursor ? { skip: 1, cursor: { id: cursor } } : {}),
+      orderBy: { id: 'asc' },
+    })
+    yield batch.map(toReportRow)
+    cursor = batch.length === 500 ? batch[batch.length - 1].id : undefined
+  } while (cursor)
+}
+```
+__WARDEN_EOF__
+mkdir -p .warden/wards/WARD-002
+cat > .warden/wards/WARD-002/ward.md <<'__WARDEN_EOF__'
 # WARD-002: Paginate every list endpoint
 
 **Description:** List endpoints must return pages (a limit and a cursor) instead of every record.
@@ -90,8 +129,40 @@ export async function listOrders(req: Request) {
 
 **Human review:** Not required
 __WARDEN_EOF__
-mkdir -p .warden/wards
-cat > .warden/wards/WARD-003.md <<'__WARDEN_EOF__'
+mkdir -p .warden/wards/WARD-002/examples
+cat > .warden/wards/WARD-002/examples/unpaginated-search.md <<'__WARDEN_EOF__'
+# Customer search returns everything
+
+## Sample
+
+```ts
+// src/handlers/customers.ts (excerpt)
+export async function searchCustomers(req: { query: unknown }) {
+  const { q } = SearchCustomers.parse(req.query)
+  return { customers: await db.customer.findMany({ where: { name: { contains: q } } }) }
+}
+```
+
+## Expected fix shape
+
+- The handler accepts `limit` and `cursor` and passes both to the query.
+- The response includes the cursor for the next page.
+
+```ts
+const SearchCustomers = z.object({
+  q: z.string(),
+  cursor: z.string().optional(),
+  limit: z.coerce.number().int().min(1).max(100).default(25),
+})
+
+export async function searchCustomers(req: { query: unknown }) {
+  const { q, cursor, limit } = SearchCustomers.parse(req.query)
+  return paginate(db.customer, { where: { name: { contains: q } }, cursor, limit })
+}
+```
+__WARDEN_EOF__
+mkdir -p .warden/wards/WARD-003
+cat > .warden/wards/WARD-003/ward.md <<'__WARDEN_EOF__'
 # WARD-003: Retry every external API call
 
 **Description:** Calls to external HTTP APIs fail transiently and must be retried.
@@ -122,8 +193,35 @@ const res = await retryWithBackoff(() => fetch(`${PAYMENTS_URL}/charges`, { meth
 
 **Human review:** Not required
 __WARDEN_EOF__
-mkdir -p .warden/wards
-cat > .warden/wards/WARD-004.md <<'__WARDEN_EOF__'
+mkdir -p .warden/wards/WARD-003/examples
+cat > .warden/wards/WARD-003/examples/bare-shipping-call.md <<'__WARDEN_EOF__'
+# Shipping rates call without retry
+
+## Sample
+
+```ts
+// src/shipping/rates.ts
+export async function fetchRates(parcel: Parcel) {
+  const res = await fetch(`${SHIPPING_URL}/rates`, { method: 'POST', body: JSON.stringify(parcel) })
+  return res.json()
+}
+```
+
+## Expected fix shape
+
+- The external call is wrapped in `retryWithBackoff`.
+
+```ts
+export async function fetchRates(parcel: Parcel) {
+  const res = await retryWithBackoff(() =>
+    fetch(`${SHIPPING_URL}/rates`, { method: 'POST', body: JSON.stringify(parcel) }),
+  )
+  return res.json()
+}
+```
+__WARDEN_EOF__
+mkdir -p .warden/wards/WARD-004
+cat > .warden/wards/WARD-004/ward.md <<'__WARDEN_EOF__'
 # WARD-004: Never retry non-idempotent requests
 
 **Description:** Requests that create or change state must not be retried automatically unless they carry an idempotency key.
@@ -156,26 +254,53 @@ await retryWithBackoff(() =>
 
 **Human review:** Not required
 __WARDEN_EOF__
+mkdir -p .warden/wards/WARD-004/examples
+cat > .warden/wards/WARD-004/examples/retried-capture.md <<'__WARDEN_EOF__'
+# Payment capture retried without a key
+
+## Sample
+
+```ts
+// src/payments/capture.ts
+export async function capture(chargeId: string) {
+  return retryWithBackoff(() => fetch(`${PAYMENTS_URL}/charges/${chargeId}/capture`, { method: 'POST' }))
+}
+```
+
+## Expected fix shape
+
+- The retried POST sends an `Idempotency-Key` header.
+- The key is created once, outside the retry, so every attempt reuses it.
+
+```ts
+export async function capture(chargeId: string) {
+  const key = `capture-${chargeId}`
+  return retryWithBackoff(() =>
+    fetch(`${PAYMENTS_URL}/charges/${chargeId}/capture`, { method: 'POST', headers: { 'Idempotency-Key': key } }),
+  )
+}
+```
+__WARDEN_EOF__
 mkdir -p .warden
 cat > .warden/wards.md <<'__WARDEN_EOF__'
 # Wards
 
-Engineering standards for this repository. Each ward is one enforceable standard, kept as its own
-file in `wards/` and checked against every implementation slice by an independent reviewer.
+Engineering standards for this repository. Each ward is one enforceable standard with its own
+folder in `wards/`, checked against every implementation slice by an independent reviewer.
 Managed with the warden plugin: `/record-ward` adds a ward, `/audit-wards` consolidates them,
 `/check-wards` verifies a slice.
 
-<!-- One Summary row per file in wards/, in ID order. IDs are permanent: never renumber or
+<!-- One Summary row per folder in wards/, in ID order. IDs are permanent: never renumber or
      reuse one. Retired IDs stay listed under Retired. -->
 
 ## Summary
 
 | ID | Name | Human review |
 |----|------|--------------|
-| [WARD-001](wards/WARD-001.md) | Bound every query that can return many rows | No |
-| [WARD-002](wards/WARD-002.md) | Paginate every list endpoint | No |
-| [WARD-003](wards/WARD-003.md) | Retry every external API call | No |
-| [WARD-004](wards/WARD-004.md) | Never retry non-idempotent requests | No |
+| [WARD-001](wards/WARD-001/ward.md) | Bound every query that can return many rows | No |
+| [WARD-002](wards/WARD-002/ward.md) | Paginate every list endpoint | No |
+| [WARD-003](wards/WARD-003/ward.md) | Retry every external API call | No |
+| [WARD-004](wards/WARD-004/ward.md) | Never retry non-idempotent requests | No |
 
 ## Retired
 

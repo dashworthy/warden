@@ -1,6 +1,6 @@
 ---
 name: audit-wards
-description: "Audit this repository's ward registry, .warden/, for wards that overlap, contradict each other, are ambiguous, too broad or too restrictive, lack good examples or verification, duplicate automated tooling, or have the wrong human-review setting, then propose consolidations that name the ward IDs retained and retired. Report-only until a human approves specific changes. Use when asked to review, clean up, consolidate, dedupe, simplify or sanity-check the wards or engineering standards, or periodically as the registry grows."
+description: "Audit this repository's ward registry, .warden/, for wards that overlap, contradict each other, are ambiguous, too broad or too restrictive, lack good examples or verification, duplicate automated tooling, or have the wrong human-review setting; self-test every ward against its examples; then propose consolidations that name the ward IDs retained and retired. Report-only until a human approves specific changes. Use when asked to review, clean up, consolidate, dedupe, simplify or sanity-check the wards or engineering standards, or periodically as the registry grows."
 ---
 
 # Audit wards
@@ -12,14 +12,22 @@ Read `${CLAUDE_PLUGIN_ROOT}/shared/registry-format.md` before anything else.
 
 ## 1. Load the registry
 
-Locate `.warden/` as the format describes and read the index and every ward file, Retired
-included. If there are no ward files, say so and stop: there's nothing to audit.
+Locate `.warden/` as the format describes and read the index and every `ward.md`. Leave the
+`examples/` folders to the ward-testers: their code would only crowd this conversation. If there
+are no ward folders, say so and stop: there's nothing to audit.
 
-## 2. Check consistency
+## 2. Self-test every ward
+
+Dispatch one `warden:ward-tester` per ward, all in one message so they run in parallel, each with
+its ward folder path. Each test costs two checker runs. With more than 10 wards, say how many
+checker runs the audit needs and ask before starting (with no human to ask, run them). Every
+failed self-test becomes a recommendation, carrying the tester's likely cause.
+
+## 3. Check consistency
 
 Apply the format's consistency rules. Each break becomes a recommendation.
 
-## 3. Review every ward against every other
+## 4. Review every ward against every other
 
 1. **Same concern**: wards addressing one underlying problem.
 2. **Overlap**: wards that usually fire together and could merge into one that stays independently verifiable.
@@ -33,7 +41,7 @@ Apply the format's consistency rules. Each break becomes a recommendation.
 Preserve intent. Don't drop a meaningful constraint to shrink the count, and never change what a
 ward means except through a recommendation that says so.
 
-## 4. Report
+## 5. Report
 
 Number every recommendation (A1, A2, …) so approval can be selective. Use this layout, leaving out
 empty sections:
@@ -41,12 +49,19 @@ empty sections:
 ~~~markdown
 ## Ward audit: <n> wards, <m> recommendations
 
+### Self-test
+| Ward | Self-test | Failing cells |
+|---|---|---|
+| WARD-001 | PASS | |
+| WARD-002 | FAIL | Expected fix doesn't PASS |
+
 ### Merges
 **A1. Merge WARD-003 into WARD-001**
 - Problem: <what's wrong today>
 - Proposal: <the change>; retain WARD-001, retire WARD-003 ("Merged into WARD-001")
 - Impact: <what passes or fails differently afterwards>
 
+### Self-test failures
 ### Conflicts
 ### Ambiguities
 ### Examples and verification
@@ -55,7 +70,7 @@ empty sections:
 ### Consistency
 
 ### Proposed registry changes
-<for each recommendation: each ward file's text before → after, and the Summary and Retired rows touched>
+<for each recommendation: each file's text before → after, and the Summary and Retired rows touched>
 ~~~
 
 Every recommendation states the problem, the proposed change and its impact. Merges name the
@@ -64,14 +79,15 @@ retained ID and every retired ID.
 A healthy registry is a valid result: say "No changes recommended" with one line on what you
 checked. Don't invent recommendations.
 
-## 5. Ask which to apply
+## 6. Ask which to apply
 
 Ask with `AskUserQuestion` when it's available (multi-select over the recommendations, plus None);
 otherwise ask in plain text and stop. Approval is a human's explicit choice in this conversation.
 With no human to ask, end with the report and change nothing.
 
-## 6. Apply only what was approved
+## 7. Apply only what was approved
 
-Make exactly the approved changes: edit ward files and Summary rows; for each retired ID, delete
-its file, remove its Summary row and add a Retired row with the outcome. Keep every other file and
-line as it was. Reply with the recommendations applied and the IDs retained and retired.
+Make exactly the approved changes: edit `ward.md` and example files and Summary rows; for each
+retired ID, delete its folder, remove its Summary row and add a Retired row with the outcome. Keep
+every other file and line as it was. Re-run the self-test for each ward you changed, and reply with
+the recommendations applied, the IDs retained and retired, and the new self-test results.

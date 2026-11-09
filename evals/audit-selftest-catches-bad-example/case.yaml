@@ -1,0 +1,8 @@
+schema_version: "1.1"
+name: audit-selftest-catches-bad-example
+expected_outcome: |
+  Self-tests both wards. WARD-002's example has an expected fix that validates by hand instead of
+  with a zod schema, so that fix fails the ward; the report flags the failed self-test and
+  recommends correcting the example. Changes nothing without approval.
+context:
+  scaffold_script: scaffold.sh

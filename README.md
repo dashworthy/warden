@@ -8,8 +8,8 @@ verification procedure, kept in a registry your repository owns.
 
 | Skill | Does |
 |---|---|
-| `/record-ward` | Turns an instruction, PR comment or review finding into a ward. Checks for overlap, drafts examples and a verification procedure, and writes only after you approve. |
-| `/audit-wards` | Reviews the whole registry for overlap, conflicts, ambiguity and overreach, and proposes merges that name the IDs retained and retired. Writes only what you approve. |
+| `/record-ward` | Turns an instruction, PR comment or review finding into a ward. Checks for overlap, drafts examples and a verification procedure, self-tests the draft, and writes only after you approve. |
+| `/audit-wards` | Self-tests every ward and reviews the registry for overlap, conflicts, ambiguity and overreach, then proposes merges that name the IDs retained and retired. Writes only what you approve. |
 | `/check-wards` | Verifies a slice against every ward through an independent, read-only checker: PASS, FAIL, N/A or UNVERIFIED for each ward, actionable findings, and the items that need your review. |
 
 Linters check syntax and style. Wards cover what they can't: architecture, engineering standards
@@ -65,15 +65,18 @@ Each repository keeps its wards in `.warden/`, which you commit with your code:
 
 ```
 .warden/
-├── wards.md          index: every ward (linked), whether it needs human review, retired IDs
+├── .ignore                        keeps examples out of code searches
+├── wards.md                       index: every ward (linked), human-review flag, retired IDs
 └── wards/
-    ├── WARD-001.md   one file per ward, named by its permanent ID
-    └── WARD-002.md
+    └── WARD-001/                  one folder per ward, named by its permanent ID
+        ├── ward.md                the ward
+        └── examples/
+            └── unbounded-list.md  a violating sample and the expected fix shape
 ```
 
 The first approved `/record-ward` creates the directory and adds that ward; warden never invents
 wards or copies them between repositories. IDs are permanent: merged or removed wards move to the
-index's Retired table, and their numbers are never reused. A ward file looks like this (an
+index's Retired table, and their numbers are never reused. A `ward.md` looks like this (an
 illustration, not something warden adds for you):
 
 ````markdown
@@ -126,6 +129,29 @@ Set **Human review** to `Required` for wards an agent can't settle from code alo
 product, UX or data-risk trade-offs. `/check-wards` still checks them, then lists them for you to
 decide once it reports.
 
+### Examples and self-tests
+
+Each ward keeps one to three examples: a realistic violating **sample** and the **expected fix
+shape**, the requirements any correct fix meets plus one fix in code. They power a before/after
+self-test that `/record-ward` runs on every draft and `/audit-wards` runs on every ward:
+
+| Example | Before (sample) | Expected fix | After (applied fix) | Matches fix shape |
+|---|---|---|---|---|
+| unbounded-list | FAIL ✓ | PASS ✓ | PASS ✓ | ✓ |
+
+The sample must fail, the expected fix must pass, and the sample with the checker's recommended
+correction applied must pass and match the fix shape. A ✗ points at a loose or ambiguous ward, or
+a wrong example, before it gives flaky verdicts on real slices.
+
+Examples are deliberately bad code, so warden keeps them away from everything else:
+
+- `/check-wards` and the checker read only `ward.md`, never the examples.
+- Self-tests run in a separate `ward-tester` subagent, so example code never enters your
+  conversation, and an audit runs one tester per ward.
+- Fresh checkers judge the code cases blind: shuffled, unlabeled, without the expected fix shape.
+- `.warden/.ignore` hides the `examples/` folders from ripgrep-based searches (including Claude
+  Code's Grep), so agents searching your code don't trip over the samples.
+
 The full format is in [`shared/registry-format.md`](shared/registry-format.md).
 
 ## Structure
@@ -137,8 +163,10 @@ warden/
 │   ├── record-ward/           /record-ward
 │   ├── audit-wards/           /audit-wards
 │   └── check-wards/           /check-wards: scope, dispatch, fix loop, human review
-├── agents/ward-checker.md     the independent, read-only checker
-├── shared/registry-format.md  registry location, template, ward format, IDs
+├── agents/
+│   ├── ward-checker.md        the independent, read-only checker
+│   └── ward-tester.md         the before/after self-test, isolated from your conversation
+├── shared/registry-format.md  registry location, templates, ward and example formats, IDs
 └── evals/                     claude plugin eval cases for all three skills
 ```
 

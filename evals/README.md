@@ -10,7 +10,7 @@ against a no-plugin baseline, so every number says what warden adds over plain C
 
 | Case | Measures |
 |---|---|
-| `record-new-ward-creates-registry` | Drafts WARD-001 in full, says `.warden/` will be created, and writes nothing before approval. |
+| `record-new-ward-creates-registry` | Drafts WARD-001 in full with an example, self-tests it with the ward-tester, says `.warden/` will be created, and writes nothing before approval. |
 | `record-extends-existing-ward` | Extends the existing WARD-001 instead of adding a near-duplicate ward. |
 | `record-rejects-linter-duplicate` | Declines a ward that ESLint's `no-console` rule already enforces. |
 
@@ -18,22 +18,24 @@ against a no-plugin baseline, so every number says what warden adds over plain C
 
 | Case | Measures |
 |---|---|
-| `audit-finds-merge-and-conflict` | Recommends a merge naming the retained and retired IDs, and flags a real conflict with a resolution. |
+| `audit-finds-merge-and-conflict` | Self-tests every ward; recommends a merge naming the retained and retired IDs, and flags a real conflict with a resolution. |
 | `audit-healthy-registry-no-churn` | Recommends no merges, removals or conflicts for a clean registry. |
+| `audit-selftest-catches-bad-example` | The self-test catches an example whose expected fix violates its own ward. |
 
 **`/check-wards`**
 
 | Case | Measures |
 |---|---|
-| `check-reports-every-ward` | Dispatches the ward-checker; every ward appears once (FAIL / PASS / N/A), overall FAIL, with a file:line finding; edits nothing. |
+| `check-reports-every-ward` | Dispatches the ward-checker; one table row per ward (FAIL / PASS / N/A), totals, overall FAIL, a file:line finding; edits nothing and never opens examples. |
 | `check-empty-registry-unverified` | An empty registry reports UNVERIFIED, never PASS. |
 | `check-fix-holds-human-review` | `--fix` corrects the finding that doesn't need human review, re-checks, and hands the human-review ward to the human untouched. |
 
 ## How scoring is wired
 
-- **`fired-*`**: a `with-only` indicator that the skill ran. The baseline can't fire it, so it marks engagement, not quality.
-- **`no-write*` / `no-edit*`**: `tool_used` with `max: 0`: nothing is written before approval, and checks stay report-only without `--fix`.
-- **`dispatches-checker` / `checks-and-rechecks`**: the verdict comes from the `ward-checker` subagent, and `--fix` re-checks with a fresh one.
+- **`fired-*`**: on the plain-language prompts only, a `with-only` indicator that the model chose the skill (so it also tests triggering). Prompts that start with a slash command expand the skill directly, record no Skill call, and carry no `fired-*` grader.
+- **`no-write` / `no-edit` / `no-example-reads`**: `tool_used` with `max: 0`: nothing is written before approval, checks stay report-only without `--fix`, and a check never opens ward examples.
+- **`dispatches-checker` / `checks-and-rechecks` / `self-tests-*`**: scored on both arms. Verdicts come from the `ward-checker` subagent, self-tests from the `ward-tester`, and `--fix` re-checks with a fresh checker.
+- **`row-*` / `totals` / `overall-*` / `never-pass` / `full-ward-draft`**: deterministic `regex` checks on the final message: the report's summary, and every field of a drafted ward.
 - **LLM graders**: judge the proposal, report or final message against the case's expected outcome.
 
 ## Running

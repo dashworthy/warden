@@ -45,15 +45,19 @@ export const routes = {
 }
 __WARDEN_EOF__
 mkdir -p .warden
+cat > .warden/.ignore <<'__WARDEN_EOF__'
+wards/*/examples/
+__WARDEN_EOF__
+mkdir -p .warden
 cat > .warden/wards.md <<'__WARDEN_EOF__'
 # Wards
 
-Engineering standards for this repository. Each ward is one enforceable standard, kept as its own
-file in `wards/` and checked against every implementation slice by an independent reviewer.
+Engineering standards for this repository. Each ward is one enforceable standard with its own
+folder in `wards/`, checked against every implementation slice by an independent reviewer.
 Managed with the warden plugin: `/record-ward` adds a ward, `/audit-wards` consolidates them,
 `/check-wards` verifies a slice.
 
-<!-- One Summary row per file in wards/, in ID order. IDs are permanent: never renumber or
+<!-- One Summary row per folder in wards/, in ID order. IDs are permanent: never renumber or
      reuse one. Retired IDs stay listed under Retired. -->
 
 ## Summary

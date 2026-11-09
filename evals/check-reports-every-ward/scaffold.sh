@@ -44,8 +44,12 @@ export const routes = {
   'GET /orders': listOrders,
 }
 __WARDEN_EOF__
-mkdir -p .warden/wards
-cat > .warden/wards/WARD-001.md <<'__WARDEN_EOF__'
+mkdir -p .warden
+cat > .warden/.ignore <<'__WARDEN_EOF__'
+wards/*/examples/
+__WARDEN_EOF__
+mkdir -p .warden/wards/WARD-001
+cat > .warden/wards/WARD-001/ward.md <<'__WARDEN_EOF__'
 # WARD-001: Bound every query that can return many rows
 
 **Description:** List and export queries that load every matching row exhaust memory and time out as data grows.
@@ -78,8 +82,43 @@ const orders = await db.order.findMany({ where: { accountId }, take: limit, skip
 
 **Human review:** Not required
 __WARDEN_EOF__
-mkdir -p .warden/wards
-cat > .warden/wards/WARD-002.md <<'__WARDEN_EOF__'
+mkdir -p .warden/wards/WARD-001/examples
+cat > .warden/wards/WARD-001/examples/overdue-payments-report.md <<'__WARDEN_EOF__'
+# Overdue payments report
+
+## Sample
+
+```ts
+// src/reports/overdue.ts (excerpt)
+export async function overduePayments(now: Date) {
+  const payments = await db.payment.findMany({ where: { dueAt: { lt: now }, paidAt: null } })
+  return payments.map(toReportRow)
+}
+```
+
+## Expected fix shape
+
+- The query is bounded: `take`/`skip`, a cursor, or processing in fixed-size batches.
+- The filter and the report rows stay the same.
+
+```ts
+export async function* overduePayments(now: Date) {
+  let cursor: string | undefined
+  do {
+    const batch = await db.payment.findMany({
+      where: { dueAt: { lt: now }, paidAt: null },
+      take: 500,
+      ...(cursor ? { skip: 1, cursor: { id: cursor } } : {}),
+      orderBy: { id: 'asc' },
+    })
+    yield batch.map(toReportRow)
+    cursor = batch.length === 500 ? batch[batch.length - 1].id : undefined
+  } while (cursor)
+}
+```
+__WARDEN_EOF__
+mkdir -p .warden/wards/WARD-002
+cat > .warden/wards/WARD-002/ward.md <<'__WARDEN_EOF__'
 # WARD-002: Validate request input at the handler boundary
 
 **Description:** Handlers that pass raw request input to services let malformed or hostile data deep into the system.
@@ -117,8 +156,36 @@ export async function createInvoice(req: Request) {
 
 **Human review:** Not required
 __WARDEN_EOF__
-mkdir -p .warden/wards
-cat > .warden/wards/WARD-003.md <<'__WARDEN_EOF__'
+mkdir -p .warden/wards/WARD-002/examples
+cat > .warden/wards/WARD-002/examples/raw-refund-body.md <<'__WARDEN_EOF__'
+# Refund created from the raw body
+
+## Sample
+
+```ts
+// src/handlers/refunds.ts (excerpt)
+export async function createRefund(req: { body: unknown }) {
+  const { paymentId, amountCents } = req.body as { paymentId: string; amountCents: number }
+  return refunds.create({ paymentId, amountCents })
+}
+```
+
+## Expected fix shape
+
+- A zod schema parses `req.body` before anything else uses it.
+- The service receives the parsed values, never `req.body`.
+
+```ts
+const CreateRefund = z.object({ paymentId: z.string().uuid(), amountCents: z.number().int().positive() })
+
+export async function createRefund(req: { body: unknown }) {
+  const input = CreateRefund.parse(req.body)
+  return refunds.create(input)
+}
+```
+__WARDEN_EOF__
+mkdir -p .warden/wards/WARD-003
+cat > .warden/wards/WARD-003/ward.md <<'__WARDEN_EOF__'
 # WARD-003: Make every migration reversible
 
 **Description:** Migrations without a working `down` step can't be rolled back during an incident.
@@ -153,25 +220,54 @@ export async function down(db: Db) {
 
 **Human review:** Not required
 __WARDEN_EOF__
+mkdir -p .warden/wards/WARD-003/examples
+cat > .warden/wards/WARD-003/examples/empty-down.md <<'__WARDEN_EOF__'
+# Migration with an empty down
+
+## Sample
+
+```ts
+// migrations/20261101_add_credit_notes.ts
+export async function up(db: Db) {
+  await db.schema.createTable('credit_notes', (t) => {
+    t.uuid('id').primary()
+    t.uuid('invoice_id').notNullable()
+  })
+}
+
+export async function down() {}
+```
+
+## Expected fix shape
+
+- `down` drops exactly what `up` creates.
+- `up` stays the same.
+
+```ts
+export async function down(db: Db) {
+  await db.schema.dropTable('credit_notes')
+}
+```
+__WARDEN_EOF__
 mkdir -p .warden
 cat > .warden/wards.md <<'__WARDEN_EOF__'
 # Wards
 
-Engineering standards for this repository. Each ward is one enforceable standard, kept as its own
-file in `wards/` and checked against every implementation slice by an independent reviewer.
+Engineering standards for this repository. Each ward is one enforceable standard with its own
+folder in `wards/`, checked against every implementation slice by an independent reviewer.
 Managed with the warden plugin: `/record-ward` adds a ward, `/audit-wards` consolidates them,
 `/check-wards` verifies a slice.
 
-<!-- One Summary row per file in wards/, in ID order. IDs are permanent: never renumber or
+<!-- One Summary row per folder in wards/, in ID order. IDs are permanent: never renumber or
      reuse one. Retired IDs stay listed under Retired. -->
 
 ## Summary
 
 | ID | Name | Human review |
 |----|------|--------------|
-| [WARD-001](wards/WARD-001.md) | Bound every query that can return many rows | No |
-| [WARD-002](wards/WARD-002.md) | Validate request input at the handler boundary | No |
-| [WARD-003](wards/WARD-003.md) | Make every migration reversible | No |
+| [WARD-001](wards/WARD-001/ward.md) | Bound every query that can return many rows | No |
+| [WARD-002](wards/WARD-002/ward.md) | Validate request input at the handler boundary | No |
+| [WARD-003](wards/WARD-003/ward.md) | Make every migration reversible | No |
 
 ## Retired
 

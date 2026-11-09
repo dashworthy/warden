@@ -1,8 +1,8 @@
 ---
 tags: [warden, audit-wards]
-max_turns: 30
-timeout_seconds: 900
+max_turns: 40
+timeout_seconds: 1800
 allowed_tools: [Read, Glob, Grep, Bash, Skill, Agent, Write, Edit]
 ---
 
-/audit-wards quick sanity check before I share our wards with the team
+Before I share our wards with the team, sanity-check them for overlaps, conflicts or anything vague.
