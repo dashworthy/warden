@@ -46,6 +46,17 @@ commits: it brings those corrections to you.
 - An empty registry reports **UNVERIFIED**, never PASS.
 - `--fix` applies the corrections that don't need human review and re-checks, up to three rounds.
 
+## Best practices
+
+`best-practices/` holds generic wards any repository can adopt: thin controllers, translated text,
+scope discipline, API consumer safety, component reuse, safe migrations, validated references, one
+contract per endpoint, per-set work, architecture-test exemptions, domain naming, secrets, test
+first and state transitions. Each names its repository-specific parts as blanks
+(`<<translate_fn>>`), with how to find them and Laravel and Node examples.
+`/record-ward BP-006` fills the blanks from your code, self-tests the result and writes it to your
+registry once you approve; `/record-ward best practices` lists the ones that fit. The format is in
+`shared/best-practices-format.md`.
+
 ## Install
 
 ```
@@ -57,6 +68,7 @@ commits: it brings those corrections to you.
 
 ```
 /record-ward PR feedback: list endpoints keep loading every row; always paginate
+/record-ward BP-006
 /audit-wards
 /check-wards
 /check-wards --fix main..HEAD

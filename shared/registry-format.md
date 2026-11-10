@@ -89,6 +89,7 @@ human-review:
   - '<optional: a question a person must answer, e.g. "Is the error message clear to a customer?">'
 enforced-by:
   - '<optional: a test file that checks the ward, e.g. "tests/arch/handlers.test.ts">'
+upstream: '<optional: the best practice it was adopted from, e.g. "BP-006@1">'
 ---
 
 # WARD-NNN: <imperative name, e.g. "Bound every query that can return many rows">
@@ -137,6 +138,7 @@ enforced-by:
 | Verification | Steps that lead two reviewers to the same verdict, ending in explicit PASS and FAIL conditions. Give the exact command for anything a command can decide; for judgment calls, say what to inspect and what evidence settles it. |
 | Applicability | Enough to mark the ward N/A with confidence among the files its paths match: which kinds of code or change, and the exceptions. Paths say where; Applicability says what. |
 | `enforced-by` | Test files in this repository that check all or part of the ward, such as an architecture test. The checker runs them; the body still says what the ward requires and why, so an agent can comply before a test fails. A ward that a test or tool enforces completely, with nothing for an agent to learn from it, is not a ward. |
+| `upstream` | Only for a ward adopted from warden's catalog (`best-practices/`, see `best-practices-format.md`): the best practice's ID and the version adopted, so an audit can compare the ward with a newer version. The ward is the repository's own; it may differ from its upstream. |
 
 ## Phases
 

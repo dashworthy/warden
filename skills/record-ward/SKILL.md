@@ -1,7 +1,7 @@
 ---
 name: record-ward
-description: "Record a new ward (an enforceable engineering standard) in this repository's ward registry, .warden/, from a user instruction, PR feedback, a code review finding or an engineering concern. Checks existing wards for overlap and conflict, drafts the ward with realistic violation and compliant examples, a verification procedure, a human-review setting and a sample with its expected fix shape, self-tests the draft, and changes the registry only after a human approves. Use when someone wants something made a ward, rule or standard, wants a recurring mistake or review comment to stop happening, or wants review feedback turned into something agents enforce."
-argument-hint: "<concern, feedback, or standard to record>"
+description: "Record a new ward (an enforceable engineering standard) in this repository's ward registry, .warden/, from a user instruction, PR feedback, a code review finding or an engineering concern. Checks existing wards for overlap and conflict, drafts the ward with realistic violation and compliant examples, a verification procedure, a human-review setting and a sample with its expected fix shape, self-tests the draft, and changes the registry only after a human approves. Use when someone wants something made a ward, rule or standard, wants a recurring mistake or review comment to stop happening, or wants review feedback turned into something agents enforce, or wants to adopt one of warden's best practices (BP-NNN) or asks which best practices fit the repository."
+argument-hint: "<concern, feedback, or standard to record | BP-NNN | best practices>"
 ---
 
 # Record a ward
@@ -11,6 +11,17 @@ a self-test, and writes it to the registry only after a human approves.
 
 Read `${CLAUDE_PLUGIN_ROOT}/shared/registry-format.md` before anything else. It defines where the
 registry lives, the ward and example formats, how IDs work, and what makes a ward good.
+
+## Adopting a best practice
+
+When the input names a best practice (`BP-NNN`), adopt it instead of drafting one: read
+`${CLAUDE_PLUGIN_ROOT}/shared/best-practices-format.md` and
+`${CLAUDE_PLUGIN_ROOT}/best-practices/BP-NNN/`, read the registry (step 2), and decide the outcome
+against the active wards (step 3: a ward that already covers it means Extend, or nothing). Then
+fill its bindings as the format's "Adopting a best practice" says, showing each value with its
+evidence, and continue from step 5. When the input asks which best practices fit, read
+`${CLAUDE_PLUGIN_ROOT}/best-practices/catalog.md`, check each against the repository's stack and
+registry, and list the ones that apply and aren't covered yet, without writing anything.
 
 ## 1. Find the underlying problem
 
