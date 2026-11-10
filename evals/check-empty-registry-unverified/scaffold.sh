@@ -62,8 +62,8 @@ Managed with the warden plugin: `/record-ward` adds a ward, `/audit-wards` conso
 
 ## Summary
 
-| ID | Name | Applies to | Human review |
-|----|------|------------|--------------|
+| ID | Name | Phases | Applies to | Human review |
+|----|------|--------|------------|--------------|
 
 ## Retired
 

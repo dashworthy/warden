@@ -132,9 +132,9 @@ Managed with the warden plugin: `/record-ward` adds a ward, `/audit-wards` conso
 
 ## Summary
 
-| ID | Name | Applies to | Human review |
-|----|------|------------|--------------|
-| [WARD-001](wards/WARD-001/ward.md) | Bound every query that can return many rows | `src/**` | No |
+| ID | Name | Phases | Applies to | Human review |
+|----|------|--------|------------|--------------|
+| [WARD-001](wards/WARD-001/ward.md) | Bound every query that can return many rows | code | `src/**` | No |
 
 ## Retired
 

@@ -18,6 +18,10 @@ The input may be an instruction, a PR comment, a review finding or a described p
 underlying problem in one sentence: what goes wrong and what it costs. Generalize from the
 instance to the principle, and stop before it turns vague.
 
+Decide the ward's phase from what it governs: `design` for plans and design documents, `code` for
+the code itself (the default), `pr` for pull request titles, bodies, labels, commits and size. A
+ward takes several phases only when it can be checked in each.
+
 Note the ward's `source` (who asked, or which PR, review or incident prompted it), today's date
 for `decided`, and an `until` if the person says the ward is temporary. If the source is a link you can't read, ask for the text. If an ambiguity
 would change the ward, ask one question before drafting.
@@ -46,10 +50,12 @@ write this code differently? Only "yes" earns a ward.
 
 ## 4. Draft the ward and its example
 
-Write `ward.md` in the registry format: its frontmatter, the heading with its ID and name, and all
-six fields. Take examples from this repository's languages and frameworks; when the concern came
-from real code, use a trimmed version of it as the violation. Make the verification decidable:
-explicit PASS and FAIL conditions, and an exact command wherever a command can decide.
+Write `ward.md` in the registry format: its frontmatter (`phases` only when it isn't a `code` ward),
+the heading with its ID and name, and all six fields. Write Violations and Compliant examples in the
+phase's medium: plan excerpts for `design`, code for `code`, PR text or commit messages for `pr`.
+Take examples from this repository's languages and frameworks; when the concern came from real code,
+use a trimmed version of it as the violation. Make the verification decidable: explicit PASS and
+FAIL conditions, and an exact command wherever a command can decide.
 
 Scope **paths** to where the governed code actually lives in this repository: look at the tree
 (`git ls-files`), pick the narrowest globs that cover it, and confirm each matches files with
@@ -65,8 +71,8 @@ List in **enforced-by** any existing test file that checks the ward, such as an 
 (confirm each with `git ls-files`). Don't write new tests as part of recording a ward.
 
 Then draft at least one example file in the format: a realistic Sample that violates the ward in a
-different way from its Violations field, at a path inside the ward's paths, an Expected fix
-shape, and the fix in code.
+different way from its Violations field (for a `code` ward, at a path inside the ward's paths),
+an Expected fix shape, and the fix, all in the phase's medium.
 
 For Extend or Replace, draft the complete updated ward, and examples for anything it newly covers.
 
@@ -88,8 +94,8 @@ Present, in order:
    show the changed fields as before → after.
 3. **Examples**: each example file exactly as it will be written, in a `~~~markdown` block.
 4. **Self-test**: the ward-tester's table.
-5. **Registry changes**: the files written, the Summary row with its Applies to, any Retired row,
-   and "creates `.warden/`" when the registry doesn't exist yet.
+5. **Registry changes**: the files written, the Summary row with its Phases and Applies to, any
+   Retired row, and "creates `.warden/`" when the registry doesn't exist yet.
 6. **Human review**: the `human-review` questions, or "none", and a one-line reason.
 
 Ask for approval with `AskUserQuestion` when it's available (Approve / Change something / Reject);

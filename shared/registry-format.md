@@ -47,8 +47,8 @@ Managed with the warden plugin: `/record-ward` adds a ward, `/audit-wards` conso
 
 ## Summary
 
-| ID | Name | Applies to | Human review |
-|----|------|------------|--------------|
+| ID | Name | Phases | Applies to | Human review |
+|----|------|--------|------------|--------------|
 
 ## Retired
 
@@ -59,9 +59,10 @@ Managed with the warden plugin: `/record-ward` adds a ward, `/audit-wards` conso
 ## The index
 
 - **Summary**: one row per ward folder, in ID order, linking to its ward file:
-  `` | [WARD-001](wards/WARD-001/ward.md) | <name> | `src/handlers/**` | No | ``. Applies to
-  lists the ward's paths, each in backticks and separated by commas, or `All` when the ward has
-  none. Human review is `Yes` when the ward lists `human-review` questions, otherwise `No`.
+  `` | [WARD-001](wards/WARD-001/ward.md) | <name> | code | `src/handlers/**` | No | ``. Phases
+  lists the ward's phases, separated by commas (`code` when it has none). Applies to lists its
+  paths, each in backticks and separated by commas, or `All` when the ward has none. Human review
+  is `Yes` when the ward lists `human-review` questions, otherwise `No`.
 - **Retired**: one row per retired ID, saying what happened to it.
 
 The Summary doubles as a lookup: an agent about to edit a file opens every ward whose Applies to
@@ -80,6 +81,8 @@ apply. Quote string values (`'PR #142'`: an unquoted `#` starts a YAML comment).
 source: '<who decided or what prompted the ward, e.g. "PR #142 review by Priya">'
 decided: <YYYY-MM-DD>
 until: '<optional: when a temporary ward stops holding, e.g. "the public launch">'
+phases:
+  - '<optional: design, code or pr; absent means code>'
 paths:
   - '<optional: where the ward applies, e.g. "src/handlers/**">'
 human-review:
@@ -123,6 +126,7 @@ enforced-by:
 |---|---|
 | `source`, `decided` | Who decided or what prompted the ward (a person's instruction, a PR or review comment, an incident) and the ISO date, so an audit can tell a human decision from an inference and see how old the ward is. |
 | `until` | Only for a ward that holds for a while: the event or date that ends it, e.g. "the public launch". An audit asks the human whether it has passed. |
+| `phases` | When in the workflow the ward is checked (see Phases). Leave it out for a code-review ward. |
 | `paths` | The narrowest globs that cover where the code the ward governs lives (see Paths). Leave `paths` out only for a ward that genuinely applies anywhere in the repository. |
 | `human-review` | One question per entry that a person must answer, listed only when an agent can't settle the ward from the code alone (product or UX judgment, security or data-risk trade-offs, domain facts the code doesn't contain). Leave `human-review` out when an agent can decide. |
 | Name (in the heading) | Imperative, under ten words, naming the principle rather than one instance. |
@@ -133,6 +137,23 @@ enforced-by:
 | Verification | Steps that lead two reviewers to the same verdict, ending in explicit PASS and FAIL conditions. Give the exact command for anything a command can decide; for judgment calls, say what to inspect and what evidence settles it. |
 | Applicability | Enough to mark the ward N/A with confidence among the files its paths match: which kinds of code or change, and the exceptions. Paths say where; Applicability says what. |
 | `enforced-by` | Test files in this repository that check all or part of the ward, such as an architecture test. The checker runs them; the body still says what the ward requires and why, so an agent can comply before a test fails. A ward that a test or tool enforces completely, with nothing for an agent to learn from it, is not a ward. |
+
+## Phases
+
+A ward belongs to one or more phases, and `/check-wards --phase <phase>` checks only that phase's
+wards against that phase's input. The phases are fixed:
+
+| Phase | Checked | Input the checker reads | Example ward |
+|---|---|---|---|
+| `design` | Before implementation, on a plan or design document | The document the caller names | "Every plan states how the change is rolled back" |
+| `code` | After each implementation slice (the default) | The diff and untracked files | "Bound every query that can return many rows" |
+| `pr` | Before opening or merging a pull request | The PR's title, body, labels and commits (or the branch's commits and a draft title and body when there's no PR yet), and its diff stats | "Every PR body links its issue" |
+
+- A ward without `phases` is a `code` ward.
+- Write a ward's Violations, Compliant examples and example Samples in its phase's medium: plan
+  excerpts for `design`, code for `code`, PR titles, bodies or commit messages for `pr`.
+- `paths` narrows `code` and `pr` wards by the files the change touches. `design` checks skip the
+  paths step, because the files a plan describes may not exist yet; Applicability decides there.
 
 ## Paths
 
@@ -186,7 +207,9 @@ correct fix takes; the self-test uses it as a before/after check of the ward.
 - **Vary it.** Don't copy the ward's Violations and Compliant examples: write the code the way a
   real slice would, so the self-test shows the ward generalizes.
 - **Keep it short**: an excerpt under about 40 lines, with only the context the ward needs.
-- **Keep it in scope**: the path in the Sample's first-line comment matches the ward's paths.
+- **Keep it in scope**: for a `code` ward, the path in the Sample's first-line comment matches the
+  ward's paths. For `design` and `pr` wards, the first line names what the sample is (a plan
+  file, a PR title and body, a commit message).
 - **Keep it out of checks.** Examples are deliberately bad code. `/check-wards` and the checker
   never read them, `.warden/.ignore` keeps them out of code searches, and only the ward-tester
   opens them.
@@ -217,12 +240,13 @@ and add a Retired row: `| WARD-004 | Former name | Merged into WARD-002 |`, or
 A registry is consistent when:
 
 1. Every Summary row links to an existing ward folder, and every ward folder has a Summary row with
-   the same name, Applies to and Human review value.
+   the same name, Phases, Applies to and Human review value.
 2. Each folder's name matches the ID in its `ward.md` heading.
 3. No ID appears twice, and no active ID is also listed as retired.
 4. Every `ward.md` has `source`, a `decided` date, its heading and all six fields; its `paths`, if
    any, use only `*` and `**` and each match at least one tracked file; its `human-review`, if any,
-   lists at least one question; and every `enforced-by` file is tracked.
+   lists at least one question; its `phases`, if any, name only `design`, `code` or `pr`; and every
+   `enforced-by` file is tracked.
 5. Every ward has at least one example with a Sample, an Expected fix shape and fix code, and each
    Sample's path matches the ward's paths.
 6. Summary rows are in ID order, and `.warden/.ignore` lists `wards/*/examples/`.

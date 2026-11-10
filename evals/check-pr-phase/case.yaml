@@ -1,0 +1,10 @@
+schema_version: "1.1"
+name: check-pr-phase
+expected_outcome: |
+  Checks only the pr-phase wards. With no PR on GitHub, it reads the branch's commits against main
+  and the draft title and body from the prompt. WARD-002 is FAIL because commit "stuff" has no
+  Conventional Commits type; WARD-003 is PASS because the draft body says "Closes #88". WARD-001,
+  a code ward, is left out of the report even though the branch has an unbounded query. Overall
+  FAIL; edits nothing, and doesn't rewrite commits.
+context:
+  scaffold_script: scaffold.sh

@@ -29,6 +29,8 @@ against a no-plugin baseline, so every number says what warden adds over plain C
 |---|---|
 | `check-reports-every-ward` | Dispatches the ward-checker; one table row per ward (FAIL / PASS / N/A, the N/A ward's paths matching no changed file), totals, overall FAIL, a file:line finding; edits nothing and never opens examples. |
 | `check-runs-enforced-by-tests` | Runs each ward's `enforced-by` test: a failing test makes WARD-001 FAIL with a finding that cites it; a missing test file makes WARD-002 UNVERIFIED, not PASS. |
+| `check-pr-phase` | `--phase pr` checks only pr wards against the branch's commits and a draft body: a bad commit subject fails, the issue link passes, the code ward is left out, and nothing is rewritten. |
+| `check-design-phase` | `--phase design` checks a plan against the design ward: a missing rollback section fails with an actionable finding, and the code ward is left out. |
 | `check-empty-registry-unverified` | An empty registry reports UNVERIFIED, never PASS. |
 | `check-fix-holds-human-review` | `--fix` corrects the finding that doesn't need human review, re-checks, and hands the human-review ward to the human untouched. |
 

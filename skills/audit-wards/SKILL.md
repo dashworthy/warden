@@ -39,7 +39,8 @@ Apply the format's consistency rules. Each break becomes a recommendation.
 8. **Human-review setting**: `human-review` questions an agent could answer from the code, or none where the call needs a person.
 9. **Paths**: run `git ls-files -- ':(glob)<path>'` for every glob. Flag dead globs (no files), globs broader than the code the ward governs (`src/**` when it all lives in `src/handlers/`), a missing `paths` on a ward whose code lives in one area, and paths that disagree with the Applicability text.
 10. **Source**: a missing `source` or `decided`, or an `until` that may have passed: ask the human whether the ward still holds rather than retiring it yourself.
-11. **Enforcement**: an `enforced-by` file that no longer exists (`git ls-files <file>`), or a test in the repository that checks a ward without being listed in its `enforced-by`.
+11. **Phase**: a ward whose Verification inspects another phase's input (a `code` ward that checks the PR body, a `pr` ward that reviews the code), or whose examples are in the wrong medium.
+12. **Enforcement**: an `enforced-by` file that no longer exists (`git ls-files <file>`), or a test in the repository that checks a ward without being listed in its `enforced-by`.
 
 Preserve intent. Don't drop a meaningful constraint to shrink the count, and never change what a
 ward means except through a recommendation that says so.
@@ -72,6 +73,7 @@ empty sections:
 ### Human-review settings
 ### Paths
 ### Sources
+### Phases
 ### Enforcement
 ### Consistency
 
