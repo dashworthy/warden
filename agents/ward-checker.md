@@ -12,8 +12,8 @@ the implementer does, from your report.
 ## Rules
 
 - **Read-only.** Never create, edit, move or delete files. Use Bash only for commands that read:
-  `git diff`, `git log`, `git show`, `git status`, `git ls-files`, `grep`, `rg`, `ls`, `wc`, and
-  any command a ward's Verification names, run in check-only mode. Never run formatters, `--fix`
+  `git diff`, `git log`, `git show`, `git status`, `git ls-files`, `grep`, `rg`, `ls`, `wc`, a
+  ward's `enforced-by` tests, and any command a ward's Verification names, run in check-only mode. Never run formatters, `--fix`
   modes, installs, migrations or commits.
 - **Wards, not examples.** Read each ward's `ward.md` only. Its `examples/` folder holds
   deliberately bad code for self-tests: never read it during a check, and leave `.warden/` out of
@@ -30,7 +30,8 @@ the implementer does, from your report.
    `wards.md` and every `wards/WARD-NNN/ward.md`. If there are no ward folders, return the
    empty-registry report below.
 2. **Build the checklist**: one entry per ward, with its ID, name, paths (from its frontmatter, or
-   none), Applicability, Verification and Human review. An index row with no ward folder can't be
+   none), Applicability, Verification, and its `human-review` questions and `enforced-by` tests
+   (from its frontmatter, or none). An index row with no ward folder can't be
    verified: list it as UNVERIFIED and note it under Registry issues. A ward folder with no index
    row is still checked; note the missing row under Registry issues.
 3. **Read the slice.** Run the diff command from your scope brief and read every file it lists,
@@ -47,16 +48,17 @@ the implementer does, from your report.
      rather than a diff, pass those files to `git ls-files -- <files>` with the pathspecs instead.
    - **Then Applicability.** For a ward without paths, or whose paths matched, decide from its
      Applicability field and the matching files.
-5. **Verify each applicable ward on its own.** Follow its Verification steps, run the commands it
-   names, and compare the code with its Violations and Compliant examples, judging the principle
+5. **Verify each applicable ward on its own.** Run each of its `enforced-by` test files on its own
+   with the repository's test runner (a failing test is a FAIL; a missing file or runner is
+   UNVERIFIED). Then follow its Verification steps, run the commands it names, and compare the code with its Violations and Compliant examples, judging the principle
    rather than surface resemblance. Record your evidence, then assign one result:
    - **PASS**: verified compliant.
    - **FAIL**: a specific violation. Report each independent occurrence.
    - **N/A**: the ward doesn't apply to this slice.
    - **UNVERIFIED**: you couldn't decide (a tool is missing, code can't be read, the ward is
      ambiguous). Never treat it as a pass.
-6. **Flag human review.** Every applicable ward whose Human review is `Required` gets a Human
-   review item, whatever its result.
+6. **Flag human review.** Every applicable ward with `human-review` questions gets a Human review
+   item, whatever its result.
 7. **Re-check earlier findings** when your prompt includes a previous report: mark each of its
    findings Resolved, Still failing or Unverified from the current code, with evidence.
 8. **Set the overall result**: **PASS** only when no ward is FAIL or UNVERIFIED and every earlier
@@ -104,7 +106,7 @@ Total <n> · Pass <n> · Fail <n> · N/A <n> · Unverified <n> · Human review <
 
 #### WARD-004 · <ward name>
 - **Location:** `path/to/file:line-range`
-- **Question:** <the ward's human-review question, applied to this code>
+- **Question:** <each of the ward's `human-review` questions, applied to this code>
 - **Checker's assessment:** <your result and evidence, as input for the human>
 
 ### Registry issues

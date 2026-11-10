@@ -26,6 +26,8 @@ __WARDEN_EOF__
 mkdir -p .warden/wards/WARD-001
 cat > .warden/wards/WARD-001/ward.md <<'__WARDEN_EOF__'
 ---
+source: 'Team engineering review'
+decided: 2026-10-01
 paths:
   - 'src/**'
 ---
@@ -59,10 +61,6 @@ const orders = await db.order.findMany({ where: { accountId }, take: limit, skip
 - FAIL when any can return an unbounded number of rows.
 
 **Applicability:** Code that queries collections of records. Exception: tables with a hard, documented size cap, such as enums.
-
-**Human review:** Not required
-
-**Source:** Agreed in the team's engineering review, 2026-10-01
 __WARDEN_EOF__
 mkdir -p .warden/wards/WARD-001/examples
 cat > .warden/wards/WARD-001/examples/overdue-payments-report.md <<'__WARDEN_EOF__'
@@ -102,6 +100,8 @@ __WARDEN_EOF__
 mkdir -p .warden/wards/WARD-002
 cat > .warden/wards/WARD-002/ward.md <<'__WARDEN_EOF__'
 ---
+source: 'Team engineering review'
+decided: 2026-10-01
 paths:
   - 'src/handlers/**'
 ---
@@ -138,10 +138,6 @@ export async function listOrders(req: Request) {
 - FAIL when any returns an unpaginated collection.
 
 **Applicability:** HTTP handlers that return collections.
-
-**Human review:** Not required
-
-**Source:** Agreed in the team's engineering review, 2026-10-01
 __WARDEN_EOF__
 mkdir -p .warden/wards/WARD-002/examples
 cat > .warden/wards/WARD-002/examples/unpaginated-search.md <<'__WARDEN_EOF__'
@@ -177,6 +173,11 @@ export async function searchCustomers(req: { query: unknown }) {
 __WARDEN_EOF__
 mkdir -p .warden/wards/WARD-003
 cat > .warden/wards/WARD-003/ward.md <<'__WARDEN_EOF__'
+---
+source: 'Team engineering review'
+decided: 2026-10-01
+---
+
 # WARD-003: Retry every external API call
 
 **Description:** Calls to external HTTP APIs fail transiently and must be retried.
@@ -204,10 +205,6 @@ const res = await retryWithBackoff(() => fetch(`${PAYMENTS_URL}/charges`, { meth
 - FAIL when any external call isn't.
 
 **Applicability:** Every call to an external HTTP API.
-
-**Human review:** Not required
-
-**Source:** Agreed in the team's engineering review, 2026-10-01
 __WARDEN_EOF__
 mkdir -p .warden/wards/WARD-003/examples
 cat > .warden/wards/WARD-003/examples/bare-shipping-call.md <<'__WARDEN_EOF__'
@@ -238,6 +235,11 @@ export async function fetchRates(parcel: Parcel) {
 __WARDEN_EOF__
 mkdir -p .warden/wards/WARD-004
 cat > .warden/wards/WARD-004/ward.md <<'__WARDEN_EOF__'
+---
+source: 'Team engineering review'
+decided: 2026-10-01
+---
+
 # WARD-004: Never retry non-idempotent requests
 
 **Description:** Requests that create or change state must not be retried automatically unless they carry an idempotency key.
@@ -267,10 +269,6 @@ await retryWithBackoff(() =>
 - FAIL when any is retried without one.
 
 **Applicability:** Code that retries HTTP requests.
-
-**Human review:** Not required
-
-**Source:** Agreed in the team's engineering review, 2026-10-01
 __WARDEN_EOF__
 mkdir -p .warden/wards/WARD-004/examples
 cat > .warden/wards/WARD-004/examples/retried-capture.md <<'__WARDEN_EOF__'

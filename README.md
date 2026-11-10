@@ -86,6 +86,8 @@ illustration, not something warden adds for you):
 
 ````markdown
 ---
+source: 'Review of PR #87 by the platform team'
+decided: 2026-10-14
 paths:
   - 'src/**'
 ---
@@ -131,22 +133,33 @@ export function nextInvoiceNumber(): string {
 
 **Applicability:** Slices that add interfaces, abstract classes, factories or service wrappers.
 Exception: contracts the framework requires.
-
-**Human review:** Not required
-
-**Source:** Review of PR #87 by the platform team, 2026-10-14
 ````
 
 The `paths` frontmatter, the same format as Claude Code's `.claude/rules/` and Laravel Boost's
 `.ai/rules/`, scopes the ward to the files it governs. The checker matches it against the slice
 with `git diff -- ':(glob)…'`, so a ward whose paths match no changed file is N/A without anyone
 interpreting its text, and the index's Applies to column lets an agent find the wards for a file
-before it edits it. Leave `paths` out for a ward that applies everywhere. **Source** records who
-decided the ward and when, so an audit can tell a decision from an inference and spot a ward whose
-time is up.
+before it edits it. Leave `paths` out for a ward that applies everywhere. `source` and `decided`
+record who decided the ward and when, so an audit can tell a decision from an inference; add
+`until` for a temporary ward, and an audit will ask whether its time is up.
 
-Set **Human review** to `Required` for wards an agent can't settle from code alone, such as
-product, UX or data-risk trade-offs. `/check-wards` still checks them, then lists them for you to
+When a test already checks a ward (an architecture test, say), list it under `enforced-by` and the
+checker runs it:
+
+```yaml
+enforced-by:
+  - 'tests/Unit/Architecture/FormRequestsMustNotAbortTest.php'
+```
+
+Add a `human-review` list to the frontmatter, one question per entry, for wards an agent can't
+settle from code alone, such as product, UX or data-risk trade-offs:
+
+```yaml
+human-review:
+  - 'Is the confirmation wording clear to a customer about exactly what will be lost?'
+```
+
+Leave it out, like `paths`, when it doesn't apply. `/check-wards` still checks them, then lists them for you to
 decide once it reports.
 
 ### Examples and self-tests

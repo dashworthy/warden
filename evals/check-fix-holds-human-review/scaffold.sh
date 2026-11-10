@@ -51,6 +51,8 @@ __WARDEN_EOF__
 mkdir -p .warden/wards/WARD-001
 cat > .warden/wards/WARD-001/ward.md <<'__WARDEN_EOF__'
 ---
+source: 'Team engineering review'
+decided: 2026-10-01
 paths:
   - 'src/**'
 ---
@@ -84,10 +86,6 @@ const orders = await db.order.findMany({ where: { accountId }, take: limit, skip
 - FAIL when any can return an unbounded number of rows.
 
 **Applicability:** Code that queries collections of records. Exception: tables with a hard, documented size cap, such as enums.
-
-**Human review:** Not required
-
-**Source:** Agreed in the team's engineering review, 2026-10-01
 __WARDEN_EOF__
 mkdir -p .warden/wards/WARD-001/examples
 cat > .warden/wards/WARD-001/examples/overdue-payments-report.md <<'__WARDEN_EOF__'
@@ -127,8 +125,12 @@ __WARDEN_EOF__
 mkdir -p .warden/wards/WARD-002
 cat > .warden/wards/WARD-002/ward.md <<'__WARDEN_EOF__'
 ---
+source: 'Team engineering review'
+decided: 2026-10-01
 paths:
   - 'src/ui/**'
+human-review:
+  - 'Is the confirmation wording clear to a non-technical customer about exactly what will be lost?'
 ---
 
 # WARD-002: Confirm destructive bulk actions in plain language
@@ -162,10 +164,6 @@ paths:
 - FAIL when any runs without such a confirmation.
 
 **Applicability:** UI code under `src/ui/` that triggers bulk destructive actions.
-
-**Human review:** Required: is the confirmation wording clear to a non-technical customer about exactly what will be lost?
-
-**Source:** Agreed in the team's engineering review, 2026-10-01
 __WARDEN_EOF__
 mkdir -p .warden/wards/WARD-002/examples
 cat > .warden/wards/WARD-002/examples/unconfirmed-void.md <<'__WARDEN_EOF__'

@@ -28,6 +28,7 @@ against a no-plugin baseline, so every number says what warden adds over plain C
 | Case | Measures |
 |---|---|
 | `check-reports-every-ward` | Dispatches the ward-checker; one table row per ward (FAIL / PASS / N/A, the N/A ward's paths matching no changed file), totals, overall FAIL, a file:line finding; edits nothing and never opens examples. |
+| `check-runs-enforced-by-tests` | Runs each ward's `enforced-by` test: a failing test makes WARD-001 FAIL with a finding that cites it; a missing test file makes WARD-002 UNVERIFIED, not PASS. |
 | `check-empty-registry-unverified` | An empty registry reports UNVERIFIED, never PASS. |
 | `check-fix-holds-human-review` | `--fix` corrects the finding that doesn't need human review, re-checks, and hands the human-review ward to the human untouched. |
 

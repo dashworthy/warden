@@ -18,8 +18,8 @@ The input may be an instruction, a PR comment, a review finding or a described p
 underlying problem in one sentence: what goes wrong and what it costs. Generalize from the
 instance to the principle, and stop before it turns vague.
 
-Note the source for the ward's Source field: who asked or which PR, review or incident prompted
-it, and today's date. If the source is a link you can't read, ask for the text. If an ambiguity
+Note the ward's `source` (who asked, or which PR, review or incident prompted it), today's date
+for `decided`, and an `until` if the person says the ward is temporary. If the source is a link you can't read, ask for the text. If an ambiguity
 would change the ward, ask one question before drafting.
 
 ## 2. Read the registry
@@ -38,7 +38,7 @@ Compare it with every active ward and choose one outcome:
 | **Extend WARD-NNN** | A ward already covers the principle and needs wider applicability, another example or a sharper verification step. Prefer this to a near-duplicate. |
 | **Replace WARD-NNN** | A ward covers the concern, but its expectation is wrong or obsolete. Its ID is retired. |
 | **Conflicts with WARD-NNN** | The concern contradicts a ward. Don't draft around it: set out both and let the human decide. |
-| **Not a ward** | A linter, formatter, type checker or test in this repository already enforces it (check the tool configuration); it's a framework or common-practice default an agent already writes unprompted; or it can't be stated so two reviewers would agree. Say what to do instead. |
+| **Not a ward** | A linter, formatter, type checker or test in this repository already enforces it completely, with nothing an agent needs to learn from a ward (check the tool configuration; a test that checks a ward agents still need goes in `enforced-by`); it's a framework or common-practice default an agent already writes unprompted; or it can't be stated so two reviewers would agree. Say what to do instead. |
 
 Push back on wards that would encourage over-engineering or ceremony, and on wards so narrow they
 describe one line of code. The test for a new ward: without it, would the next agent plausibly
@@ -46,8 +46,8 @@ write this code differently? Only "yes" earns a ward.
 
 ## 4. Draft the ward and its example
 
-Write `ward.md` in the registry format: its `paths`, the heading with its ID and name, and all
-eight fields. Take examples from this repository's languages and frameworks; when the concern came
+Write `ward.md` in the registry format: its frontmatter, the heading with its ID and name, and all
+six fields. Take examples from this repository's languages and frameworks; when the concern came
 from real code, use a trimmed version of it as the violation. Make the verification decidable:
 explicit PASS and FAIL conditions, and an exact command wherever a command can decide.
 
@@ -57,9 +57,12 @@ Scope **paths** to where the governed code actually lives in this repository: lo
 fits, and leave paths out only when the ward applies anywhere. A concern spanning two areas (say,
 models and migrations) gets both globs.
 
-Set **Human review** on purpose. Recommend `Required` only when an agent can't settle the ward from
-the code (product or UX judgment, security or data-risk trade-offs, domain facts the code doesn't
-contain), and write the question the person answers. Otherwise, `Not required`.
+Set **human-review** on purpose. Add it to the frontmatter only when an agent can't settle the
+ward from the code (product or UX judgment, security or data-risk trade-offs, domain facts the code
+doesn't contain), with one entry per question the person answers. Otherwise leave it out.
+
+List in **enforced-by** any existing test file that checks the ward, such as an architecture test
+(confirm each with `git ls-files`). Don't write new tests as part of recording a ward.
 
 Then draft at least one example file in the format: a realistic Sample that violates the ward in a
 different way from its Violations field, at a path inside the ward's paths, an Expected fix
@@ -87,7 +90,7 @@ Present, in order:
 4. **Self-test**: the ward-tester's table.
 5. **Registry changes**: the files written, the Summary row with its Applies to, any Retired row,
    and "creates `.warden/`" when the registry doesn't exist yet.
-6. **Human review**: the setting and a one-line reason.
+6. **Human review**: the `human-review` questions, or "none", and a one-line reason.
 
 Ask for approval with `AskUserQuestion` when it's available (Approve / Change something / Reject);
 otherwise ask in plain text and stop. Approval is a human's explicit yes in this conversation; an

@@ -26,6 +26,8 @@ __WARDEN_EOF__
 mkdir -p .warden/wards/WARD-001
 cat > .warden/wards/WARD-001/ward.md <<'__WARDEN_EOF__'
 ---
+source: 'Team engineering review'
+decided: 2026-10-01
 paths:
   - 'src/**'
 ---
@@ -59,10 +61,6 @@ const orders = await db.order.findMany({ where: { accountId }, take: limit, skip
 - FAIL when any can return an unbounded number of rows.
 
 **Applicability:** Code that queries collections of records. Exception: tables with a hard, documented size cap, such as enums.
-
-**Human review:** Not required
-
-**Source:** Agreed in the team's engineering review, 2026-10-01
 __WARDEN_EOF__
 mkdir -p .warden/wards/WARD-001/examples
 cat > .warden/wards/WARD-001/examples/overdue-payments-report.md <<'__WARDEN_EOF__'
@@ -102,6 +100,8 @@ __WARDEN_EOF__
 mkdir -p .warden/wards/WARD-002
 cat > .warden/wards/WARD-002/ward.md <<'__WARDEN_EOF__'
 ---
+source: 'Team engineering review'
+decided: 2026-10-01
 paths:
   - 'migrations/**'
 ---
@@ -137,10 +137,6 @@ export async function down(db: Db) {
 - FAIL when any new migration has no `down` or one that doesn't reverse `up`.
 
 **Applicability:** Files under `migrations/`. N/A when the slice adds no migration.
-
-**Human review:** Not required
-
-**Source:** Agreed in the team's engineering review, 2026-10-01
 __WARDEN_EOF__
 mkdir -p .warden/wards/WARD-002/examples
 cat > .warden/wards/WARD-002/examples/empty-down.md <<'__WARDEN_EOF__'

@@ -1,0 +1,10 @@
+schema_version: "1.1"
+name: check-runs-enforced-by-tests
+expected_outcome: |
+  The ward-checker runs each ward's enforced-by test. WARD-001's test
+  (tests/arch/handlers-use-services.test.mjs) fails on src/handlers/invoices.ts:2, which imports
+  the db module, so WARD-001 is FAIL with a finding that cites the failing test and the import.
+  WARD-002 lists an enforced-by test file that doesn't exist, so it is UNVERIFIED, never PASS,
+  even though the handler validates its input. Overall FAIL; edits nothing.
+context:
+  scaffold_script: scaffold.sh

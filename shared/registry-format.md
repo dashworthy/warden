@@ -61,7 +61,7 @@ Managed with the warden plugin: `/record-ward` adds a ward, `/audit-wards` conso
 - **Summary**: one row per ward folder, in ID order, linking to its ward file:
   `` | [WARD-001](wards/WARD-001/ward.md) | <name> | `src/handlers/**` | No | ``. Applies to
   lists the ward's paths, each in backticks and separated by commas, or `All` when the ward has
-  none. Human review is `Yes` or `No`.
+  none. Human review is `Yes` when the ward lists `human-review` questions, otherwise `No`.
 - **Retired**: one row per retired ID, saying what happened to it.
 
 The Summary doubles as a lookup: an agent about to edit a file opens every ward whose Applies to
@@ -70,13 +70,22 @@ is checked.
 
 ## Ward file
 
-Each ward is `.warden/wards/WARD-NNN/ward.md`: optional `paths` frontmatter, a heading with its ID
-and name, then eight fields.
+Each ward is `.warden/wards/WARD-NNN/ward.md`: YAML frontmatter, a heading with its ID and name,
+then six fields. The frontmatter holds what tools act on directly; the body holds what a reviewer
+reads and judges. `source` and `decided` are required; leave out any optional key that doesn't
+apply. Quote string values (`'PR #142'`: an unquoted `#` starts a YAML comment).
 
 ~~~markdown
 ---
+source: '<who decided or what prompted the ward, e.g. "PR #142 review by Priya">'
+decided: <YYYY-MM-DD>
+until: '<optional: when a temporary ward stops holding, e.g. "the public launch">'
 paths:
-  - 'src/handlers/**'
+  - '<optional: where the ward applies, e.g. "src/handlers/**">'
+human-review:
+  - '<optional: a question a person must answer, e.g. "Is the error message clear to a customer?">'
+enforced-by:
+  - '<optional: a test file that checks the ward, e.g. "tests/arch/handlers.test.ts">'
 ---
 
 # WARD-NNN: <imperative name, e.g. "Bound every query that can return many rows">
@@ -108,15 +117,14 @@ paths:
 - FAIL when <observable condition>.
 
 **Applicability:** <the code and kinds of change this ward applies to, and explicit exceptions>
-
-**Human review:** Not required
-
-**Source:** <where the ward came from and when, e.g. "PR #142 review by Priya, 2026-11-10">
 ~~~
 
 | Field | What makes it good |
 |---|---|
-| Paths (frontmatter) | The narrowest globs that cover where the code the ward governs lives (see Paths). Leave the frontmatter out only for a ward that genuinely applies anywhere in the repository. |
+| `source`, `decided` | Who decided or what prompted the ward (a person's instruction, a PR or review comment, an incident) and the ISO date, so an audit can tell a human decision from an inference and see how old the ward is. |
+| `until` | Only for a ward that holds for a while: the event or date that ends it, e.g. "the public launch". An audit asks the human whether it has passed. |
+| `paths` | The narrowest globs that cover where the code the ward governs lives (see Paths). Leave `paths` out only for a ward that genuinely applies anywhere in the repository. |
+| `human-review` | One question per entry that a person must answer, listed only when an agent can't settle the ward from the code alone (product or UX judgment, security or data-risk trade-offs, domain facts the code doesn't contain). Leave `human-review` out when an agent can decide. |
 | Name (in the heading) | Imperative, under ten words, naming the principle rather than one instance. |
 | Description | The problem the ward prevents, in plain words. |
 | Rationale | The concrete cost of a violation: bugs, outages, coupling, review time. |
@@ -124,8 +132,7 @@ paths:
 | Compliant examples | The matching acceptable solutions, in their simplest form: never more elaborate than the problem needs. |
 | Verification | Steps that lead two reviewers to the same verdict, ending in explicit PASS and FAIL conditions. Give the exact command for anything a command can decide; for judgment calls, say what to inspect and what evidence settles it. |
 | Applicability | Enough to mark the ward N/A with confidence among the files its paths match: which kinds of code or change, and the exceptions. Paths say where; Applicability says what. |
-| Human review | `Not required`, or `Required:` followed by the question a person must answer, when an agent can't settle the ward from the code alone (product or UX judgment, security or data-risk trade-offs, domain facts the code doesn't contain). |
-| Source | Who decided or what prompted the ward (a person's instruction, a PR or review comment, an incident) and the date, so an audit can tell a human decision from an inference. A ward that holds only for a while says until when, e.g. "until the public launch". |
+| `enforced-by` | Test files in this repository that check all or part of the ward, such as an architecture test. The checker runs them; the body still says what the ward requires and why, so an agent can comply before a test fails. A ward that a test or tool enforces completely, with nothing for an agent to learn from it, is not a ward. |
 
 ## Paths
 
@@ -213,8 +220,9 @@ A registry is consistent when:
    the same name, Applies to and Human review value.
 2. Each folder's name matches the ID in its `ward.md` heading.
 3. No ID appears twice, and no active ID is also listed as retired.
-4. Every `ward.md` has its heading and all eight fields, and its `paths`, if any, use only `*` and
-   `**` and each match at least one tracked file.
+4. Every `ward.md` has `source`, a `decided` date, its heading and all six fields; its `paths`, if
+   any, use only `*` and `**` and each match at least one tracked file; its `human-review`, if any,
+   lists at least one question; and every `enforced-by` file is tracked.
 5. Every ward has at least one example with a Sample, an Expected fix shape and fix code, and each
    Sample's path matches the ward's paths.
 6. Summary rows are in ID order, and `.warden/.ignore` lists `wards/*/examples/`.
