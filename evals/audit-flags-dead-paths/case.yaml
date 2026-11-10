@@ -1,0 +1,10 @@
+schema_version: "1.1"
+name: audit-flags-dead-paths
+expected_outcome: |
+  Self-tests both wards and checks every glob with git. Flags that WARD-001's path
+  `app/Http/Controllers/**` matches no file in this TypeScript repository, so the ward would be
+  N/A on every slice, and recommends paths that cover where the queries live (such as `src/**`)
+  along with the index's Applies to. Raises nothing against WARD-002 and changes nothing without
+  approval.
+context:
+  scaffold_script: scaffold.sh

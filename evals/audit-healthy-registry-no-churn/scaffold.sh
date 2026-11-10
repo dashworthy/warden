@@ -25,6 +25,11 @@ wards/*/examples/
 __WARDEN_EOF__
 mkdir -p .warden/wards/WARD-001
 cat > .warden/wards/WARD-001/ward.md <<'__WARDEN_EOF__'
+---
+paths:
+  - 'src/**'
+---
+
 # WARD-001: Bound every query that can return many rows
 
 **Description:** List and export queries that load every matching row exhaust memory and time out as data grows.
@@ -56,6 +61,8 @@ const orders = await db.order.findMany({ where: { accountId }, take: limit, skip
 **Applicability:** Code that queries collections of records. Exception: tables with a hard, documented size cap, such as enums.
 
 **Human review:** Not required
+
+**Source:** Agreed in the team's engineering review, 2026-10-01
 __WARDEN_EOF__
 mkdir -p .warden/wards/WARD-001/examples
 cat > .warden/wards/WARD-001/examples/overdue-payments-report.md <<'__WARDEN_EOF__'
@@ -94,6 +101,11 @@ export async function* overduePayments(now: Date) {
 __WARDEN_EOF__
 mkdir -p .warden/wards/WARD-002
 cat > .warden/wards/WARD-002/ward.md <<'__WARDEN_EOF__'
+---
+paths:
+  - 'migrations/**'
+---
+
 # WARD-002: Make every migration reversible
 
 **Description:** Migrations without a working `down` step can't be rolled back during an incident.
@@ -127,6 +139,8 @@ export async function down(db: Db) {
 **Applicability:** Files under `migrations/`. N/A when the slice adds no migration.
 
 **Human review:** Not required
+
+**Source:** Agreed in the team's engineering review, 2026-10-01
 __WARDEN_EOF__
 mkdir -p .warden/wards/WARD-002/examples
 cat > .warden/wards/WARD-002/examples/empty-down.md <<'__WARDEN_EOF__'
@@ -171,15 +185,28 @@ Managed with the warden plugin: `/record-ward` adds a ward, `/audit-wards` conso
 
 ## Summary
 
-| ID | Name | Human review |
-|----|------|--------------|
-| [WARD-001](wards/WARD-001/ward.md) | Bound every query that can return many rows | No |
-| [WARD-002](wards/WARD-002/ward.md) | Make every migration reversible | No |
+| ID | Name | Applies to | Human review |
+|----|------|------------|--------------|
+| [WARD-001](wards/WARD-001/ward.md) | Bound every query that can return many rows | `src/**` | No |
+| [WARD-002](wards/WARD-002/ward.md) | Make every migration reversible | `migrations/**` | No |
 
 ## Retired
 
 | ID | Former name | Outcome |
 |----|-------------|---------|
+__WARDEN_EOF__
+mkdir -p migrations
+cat > migrations/20261001_create_invoices.ts <<'__WARDEN_EOF__'
+export async function up(db: Db) {
+  await db.schema.createTable('invoices', (t) => {
+    t.uuid('id').primary()
+    t.uuid('account_id').notNullable()
+  })
+}
+
+export async function down(db: Db) {
+  await db.schema.dropTable('invoices')
+}
 __WARDEN_EOF__
 git add -A
 git commit -q -m "base"

@@ -25,6 +25,11 @@ wards/*/examples/
 __WARDEN_EOF__
 mkdir -p .warden/wards/WARD-001
 cat > .warden/wards/WARD-001/ward.md <<'__WARDEN_EOF__'
+---
+paths:
+  - 'src/**'
+---
+
 # WARD-001: Bound every query that can return many rows
 
 **Description:** List and export queries that load every matching row exhaust memory and time out as data grows.
@@ -56,6 +61,8 @@ const orders = await db.order.findMany({ where: { accountId }, take: limit, skip
 **Applicability:** Code that queries collections of records. Exception: tables with a hard, documented size cap, such as enums.
 
 **Human review:** Not required
+
+**Source:** Agreed in the team's engineering review, 2026-10-01
 __WARDEN_EOF__
 mkdir -p .warden/wards/WARD-001/examples
 cat > .warden/wards/WARD-001/examples/overdue-payments-report.md <<'__WARDEN_EOF__'
@@ -94,6 +101,11 @@ export async function* overduePayments(now: Date) {
 __WARDEN_EOF__
 mkdir -p .warden/wards/WARD-002
 cat > .warden/wards/WARD-002/ward.md <<'__WARDEN_EOF__'
+---
+paths:
+  - 'src/handlers/**'
+---
+
 # WARD-002: Paginate every list endpoint
 
 **Description:** List endpoints must return pages (a limit and a cursor) instead of every record.
@@ -128,6 +140,8 @@ export async function listOrders(req: Request) {
 **Applicability:** HTTP handlers that return collections.
 
 **Human review:** Not required
+
+**Source:** Agreed in the team's engineering review, 2026-10-01
 __WARDEN_EOF__
 mkdir -p .warden/wards/WARD-002/examples
 cat > .warden/wards/WARD-002/examples/unpaginated-search.md <<'__WARDEN_EOF__'
@@ -192,6 +206,8 @@ const res = await retryWithBackoff(() => fetch(`${PAYMENTS_URL}/charges`, { meth
 **Applicability:** Every call to an external HTTP API.
 
 **Human review:** Not required
+
+**Source:** Agreed in the team's engineering review, 2026-10-01
 __WARDEN_EOF__
 mkdir -p .warden/wards/WARD-003/examples
 cat > .warden/wards/WARD-003/examples/bare-shipping-call.md <<'__WARDEN_EOF__'
@@ -253,6 +269,8 @@ await retryWithBackoff(() =>
 **Applicability:** Code that retries HTTP requests.
 
 **Human review:** Not required
+
+**Source:** Agreed in the team's engineering review, 2026-10-01
 __WARDEN_EOF__
 mkdir -p .warden/wards/WARD-004/examples
 cat > .warden/wards/WARD-004/examples/retried-capture.md <<'__WARDEN_EOF__'
@@ -295,18 +313,24 @@ Managed with the warden plugin: `/record-ward` adds a ward, `/audit-wards` conso
 
 ## Summary
 
-| ID | Name | Human review |
-|----|------|--------------|
-| [WARD-001](wards/WARD-001/ward.md) | Bound every query that can return many rows | No |
-| [WARD-002](wards/WARD-002/ward.md) | Paginate every list endpoint | No |
-| [WARD-003](wards/WARD-003/ward.md) | Retry every external API call | No |
-| [WARD-004](wards/WARD-004/ward.md) | Never retry non-idempotent requests | No |
+| ID | Name | Applies to | Human review |
+|----|------|------------|--------------|
+| [WARD-001](wards/WARD-001/ward.md) | Bound every query that can return many rows | `src/**` | No |
+| [WARD-002](wards/WARD-002/ward.md) | Paginate every list endpoint | `src/handlers/**` | No |
+| [WARD-003](wards/WARD-003/ward.md) | Retry every external API call | All | No |
+| [WARD-004](wards/WARD-004/ward.md) | Never retry non-idempotent requests | All | No |
 
 ## Retired
 
 | ID | Former name | Outcome |
 |----|-------------|---------|
 | WARD-005 | Use snake_case table names | Removed: enforced by the migration linter |
+__WARDEN_EOF__
+mkdir -p src/handlers
+cat > src/handlers/health.ts <<'__WARDEN_EOF__'
+export async function health() {
+  return { ok: true }
+}
 __WARDEN_EOF__
 git add -A
 git commit -q -m "base"

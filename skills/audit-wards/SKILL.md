@@ -35,8 +35,10 @@ Apply the format's consistency rules. Each break becomes a recommendation.
 4. **Ambiguity**: wording or verification two reviewers could apply differently. Quote the phrase and give both readings.
 5. **Overreach**: too broad to verify, too restrictive for real code, or pushing toward ceremony and abstraction with no concrete benefit.
 6. **Weak evidence**: unrealistic or mismatched examples, verification without clear PASS and FAIL conditions, or applicability too vague to decide N/A.
-7. **Duplicated tooling**: a linter, formatter, type checker or test in this repository already enforces the ward. Check the tool configuration before claiming it.
+7. **Duplicated tooling or defaults**: a linter, formatter, type checker or test in this repository already enforces the ward (check the tool configuration before claiming it), or it states a framework default an agent writes unprompted.
 8. **Human-review setting**: `Required` where an agent could decide, or `Not required` where the call needs a person.
+9. **Paths**: run `git ls-files -- ':(glob)<path>'` for every glob. Flag dead globs (no files), globs broader than the code the ward governs (`src/**` when it all lives in `src/handlers/`), a missing `paths` on a ward whose code lives in one area, and paths that disagree with the Applicability text.
+10. **Source**: a missing Source, or one whose time limit may have passed ("until launch"): ask the human whether the ward still holds rather than retiring it yourself.
 
 Preserve intent. Don't drop a meaningful constraint to shrink the count, and never change what a
 ward means except through a recommendation that says so.
@@ -67,6 +69,8 @@ empty sections:
 ### Examples and verification
 ### Redundant wards
 ### Human-review settings
+### Paths
+### Sources
 ### Consistency
 
 ### Proposed registry changes

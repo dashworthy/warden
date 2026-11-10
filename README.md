@@ -20,7 +20,8 @@ and implementation quality.
 ```
 /check-wards                            warden:ward-checker (new each run, read-only)
   scope the slice  ───────────────────▶   read .warden/, list every ward
-  attach the previous report               PASS / FAIL / N/A / UNVERIFIED, with evidence
+  attach the previous report               paths match no changed file → N/A (git decides)
+                                           PASS / FAIL / N/A / UNVERIFIED, with evidence
                                            re-verify each earlier finding itself
   hand the report to the implementer ◀──   summary table, findings, human-review items
   fix → /check-wards again
@@ -53,7 +54,10 @@ and implementation quality.
 Paste into the project's `CLAUDE.md` or `AGENTS.md`:
 
 ```markdown
-## Ward checks
+## Wards
+- Before planning or editing a file, open `.warden/wards.md` and read every ward whose Applies to
+  matches the file's path (`All` matches every path). Then grep `.warden/wards` for the feature's
+  key terms to catch wards a path match misses. Follow them as you write the code.
 - After each implementation slice, run `/check-wards` (`--fix` applies fixes that don't need human review).
 - Fix every FAIL and UNVERIFIED finding, then run `/check-wards` again until it reports PASS.
 - Bring me any human-review items, then stop for my approval before starting the next slice.
@@ -66,7 +70,8 @@ Each repository keeps its wards in `.warden/`, which you commit with your code:
 ```
 .warden/
 ├── .ignore                        keeps examples out of code searches
-├── wards.md                       index: every ward (linked), human-review flag, retired IDs
+├── wards.md                       index: every ward (linked), the paths it applies to,
+│                                  human-review flag, retired IDs
 └── wards/
     └── WARD-001/                  one folder per ward, named by its permanent ID
         ├── ward.md                the ward
@@ -80,6 +85,11 @@ index's Retired table, and their numbers are never reused. A `ward.md` looks lik
 illustration, not something warden adds for you):
 
 ````markdown
+---
+paths:
+  - 'src/**'
+---
+
 # WARD-001: Avoid unnecessary abstractions
 
 **Description:** Interfaces, factories and service layers added for single-use functionality add
@@ -123,7 +133,17 @@ export function nextInvoiceNumber(): string {
 Exception: contracts the framework requires.
 
 **Human review:** Not required
+
+**Source:** Review of PR #87 by the platform team, 2026-10-14
 ````
+
+The `paths` frontmatter, the same format as Claude Code's `.claude/rules/` and Laravel Boost's
+`.ai/rules/`, scopes the ward to the files it governs. The checker matches it against the slice
+with `git diff -- ':(glob)…'`, so a ward whose paths match no changed file is N/A without anyone
+interpreting its text, and the index's Applies to column lets an agent find the wards for a file
+before it edits it. Leave `paths` out for a ward that applies everywhere. **Source** records who
+decided the ward and when, so an audit can tell a decision from an inference and spot a ward whose
+time is up.
 
 Set **Human review** to `Required` for wards an agent can't settle from code alone, such as
 product, UX or data-risk trade-offs. `/check-wards` still checks them, then lists them for you to

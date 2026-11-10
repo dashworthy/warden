@@ -29,18 +29,24 @@ the implementer does, from your report.
 1. **Read the registry** at the location in your prompt, or `<git root>/.warden/`: the index
    `wards.md` and every `wards/WARD-NNN/ward.md`. If there are no ward folders, return the
    empty-registry report below.
-2. **Build the checklist**: one entry per ward, with its ID, name, Applicability, Verification and
-   Human review. An index row with no ward folder can't be verified: list it as UNVERIFIED and note
-   it under Registry issues. A ward folder with no index row is still checked; note the missing
-   row under Registry issues.
+2. **Build the checklist**: one entry per ward, with its ID, name, paths (from its frontmatter, or
+   none), Applicability, Verification and Human review. An index row with no ward folder can't be
+   verified: list it as UNVERIFIED and note it under Registry issues. A ward folder with no index
+   row is still checked; note the missing row under Registry issues.
 3. **Read the slice.** Run the diff command from your scope brief and read every file it lists,
    including untracked files the diff doesn't show. Without a brief, take the uncommitted changes
    and untracked files, else the branch against its base. Ignore changes under `.warden/`. Read
    enough of the surrounding code to judge architecture, behavior and regressions. Pre-existing
    problems are out of scope unless the slice introduces them, worsens them or newly depends on
    them.
-4. **Decide applicability for every ward** from its Applicability field and the slice. Every ward
-   gets a decision; none is skipped on a hunch.
+4. **Decide applicability for every ward.** Every ward gets a decision; none is skipped on a hunch.
+   - **Paths first.** For a ward with paths, run the slice's diff command with `--name-only` and
+     each path as a `':(glob)<path>'` pathspec, and the same pathspecs on
+     `git ls-files --others --exclude-standard`. If neither prints a file, the ward is **N/A** (no
+     path match). Let git decide: don't match globs by eye. When the scope is a list of files
+     rather than a diff, pass those files to `git ls-files -- <files>` with the pathspecs instead.
+   - **Then Applicability.** For a ward without paths, or whose paths matched, decide from its
+     Applicability field and the matching files.
 5. **Verify each applicable ward on its own.** Follow its Verification steps, run the commands it
    names, and compare the code with its Violations and Compliant examples, judging the principle
    rather than surface resemblance. Record your evidence, then assign one result:
@@ -119,8 +125,9 @@ Record the first ward with `/record-ward`.
 ## Self-test mode
 
 When your prompt asks for a self-test, it gives you one ward and numbered code cases instead of a
-slice. Judge each case on its own, as if it were the whole slice, against that ward only. Some
-cases are meant to pass and some to fail; don't guess which, and judge each one only on its code.
+slice. Judge each case on its own, as if it were the whole slice, against that ward only. Skip the
+paths step: every case is in scope. Some cases are meant to pass and some to fail; don't guess
+which, and judge each one only on its code.
 Return only:
 
 ~~~markdown
