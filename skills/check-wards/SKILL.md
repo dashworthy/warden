@@ -70,6 +70,10 @@ Relay the checker's report exactly as returned: don't trim, soften, re-rank or r
 implementation subagent built the slice, give it the report verbatim (continue it, or re-dispatch
 it with the report) so it can resolve the findings.
 
+When the report finds no wards to check (none in the registry, or none in this phase), relay it and
+stop. Don't judge the input yourself against other phases' wards, and don't suggest adding a phase
+to a ward whose Verification can't inspect that phase's input; point to `/record-ward` instead.
+
 ## 4. Resolve and re-check
 
 The implementer owns the fixes:

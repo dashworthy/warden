@@ -1,0 +1,8 @@
+schema_version: "1.1"
+name: check-empty-phase-unverified
+expected_outcome: |
+  The registry has only a code ward. A design-phase check of docs/plans/invoice-export.md finds no
+  design wards and reports an overall UNVERIFIED, never PASS, pointing to /record-ward. It doesn't
+  check the plan against the code ward or against standards it invents.
+context:
+  scaffold_script: scaffold.sh

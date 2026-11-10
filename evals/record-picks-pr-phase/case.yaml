@@ -1,0 +1,9 @@
+schema_version: "1.1"
+name: record-picks-pr-phase
+expected_outcome: |
+  Drafts a new ward whose frontmatter sets `phases` to `pr` (it governs PR descriptions, not code),
+  with Violations, Compliant examples and an example Sample written as PR description text rather
+  than code; self-tests it with the ward-tester; shows the Summary row with Phases `pr`; and stops
+  for approval without writing any file.
+context:
+  scaffold_script: scaffold.sh

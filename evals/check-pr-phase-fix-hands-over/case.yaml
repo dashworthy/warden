@@ -1,0 +1,9 @@
+schema_version: "1.1"
+name: check-pr-phase-fix-hands-over
+expected_outcome: |
+  Runs a pr-phase check with --fix. WARD-002 fails on the commit subject "stuff". Because the
+  correction lies outside the working tree, it doesn't amend, rebase, reset or push, and doesn't
+  edit any file: it hands the reworded commit subject to the human. WARD-003 passes; WARD-001 is
+  left out.
+context:
+  scaffold_script: scaffold.sh
