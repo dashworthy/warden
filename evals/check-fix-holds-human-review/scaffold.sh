@@ -50,6 +50,13 @@ wards/*/examples/
 __WARDEN_EOF__
 mkdir -p .warden/wards/WARD-001
 cat > .warden/wards/WARD-001/ward.md <<'__WARDEN_EOF__'
+---
+source: 'Team engineering review'
+decided: 2026-10-01
+paths:
+  - 'src/**'
+---
+
 # WARD-001: Bound every query that can return many rows
 
 **Description:** List and export queries that load every matching row exhaust memory and time out as data grows.
@@ -79,8 +86,6 @@ const orders = await db.order.findMany({ where: { accountId }, take: limit, skip
 - FAIL when any can return an unbounded number of rows.
 
 **Applicability:** Code that queries collections of records. Exception: tables with a hard, documented size cap, such as enums.
-
-**Human review:** Not required
 __WARDEN_EOF__
 mkdir -p .warden/wards/WARD-001/examples
 cat > .warden/wards/WARD-001/examples/overdue-payments-report.md <<'__WARDEN_EOF__'
@@ -119,6 +124,15 @@ export async function* overduePayments(now: Date) {
 __WARDEN_EOF__
 mkdir -p .warden/wards/WARD-002
 cat > .warden/wards/WARD-002/ward.md <<'__WARDEN_EOF__'
+---
+source: 'Team engineering review'
+decided: 2026-10-01
+paths:
+  - 'src/ui/**'
+human-review:
+  - 'Is the confirmation wording clear to a non-technical customer about exactly what will be lost?'
+---
+
 # WARD-002: Confirm destructive bulk actions in plain language
 
 **Description:** Bulk deletes and other irreversible bulk changes must go through a confirmation that states the consequence.
@@ -150,8 +164,6 @@ cat > .warden/wards/WARD-002/ward.md <<'__WARDEN_EOF__'
 - FAIL when any runs without such a confirmation.
 
 **Applicability:** UI code under `src/ui/` that triggers bulk destructive actions.
-
-**Human review:** Required: is the confirmation wording clear to a non-technical customer about exactly what will be lost?
 __WARDEN_EOF__
 mkdir -p .warden/wards/WARD-002/examples
 cat > .warden/wards/WARD-002/examples/unconfirmed-void.md <<'__WARDEN_EOF__'
@@ -196,10 +208,10 @@ Managed with the warden plugin: `/record-ward` adds a ward, `/audit-wards` conso
 
 ## Summary
 
-| ID | Name | Human review |
-|----|------|--------------|
-| [WARD-001](wards/WARD-001/ward.md) | Bound every query that can return many rows | No |
-| [WARD-002](wards/WARD-002/ward.md) | Confirm destructive bulk actions in plain language | Yes |
+| ID | Name | Applies to | Human review |
+|----|------|------------|--------------|
+| [WARD-001](wards/WARD-001/ward.md) | Bound every query that can return many rows | `src/**` | No |
+| [WARD-002](wards/WARD-002/ward.md) | Confirm destructive bulk actions in plain language | `src/ui/**` | Yes |
 
 ## Retired
 

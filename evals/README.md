@@ -21,12 +21,14 @@ against a no-plugin baseline, so every number says what warden adds over plain C
 | `audit-finds-merge-and-conflict` | Self-tests every ward; recommends a merge naming the retained and retired IDs, and flags a real conflict with a resolution. |
 | `audit-healthy-registry-no-churn` | Recommends no merges, removals or conflicts for a clean registry. |
 | `audit-selftest-catches-bad-example` | The self-test catches an example whose expected fix violates its own ward. |
+| `audit-flags-dead-paths` | Checks every glob with git and flags a ward whose paths match no file, proposing paths that cover the code. |
 
 **`/check-wards`**
 
 | Case | Measures |
 |---|---|
-| `check-reports-every-ward` | Dispatches the ward-checker; one table row per ward (FAIL / PASS / N/A), totals, overall FAIL, a file:line finding; edits nothing and never opens examples. |
+| `check-reports-every-ward` | Dispatches the ward-checker; one table row per ward (FAIL / PASS / N/A, the N/A ward's paths matching no changed file), totals, overall FAIL, a file:line finding; edits nothing and never opens examples. |
+| `check-runs-enforced-by-tests` | Runs each ward's `enforced-by` test: a failing test makes WARD-001 FAIL with a finding that cites it; a missing test file makes WARD-002 UNVERIFIED, not PASS. |
 | `check-empty-registry-unverified` | An empty registry reports UNVERIFIED, never PASS. |
 | `check-fix-holds-human-review` | `--fix` corrects the finding that doesn't need human review, re-checks, and hands the human-review ward to the human untouched. |
 

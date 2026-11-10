@@ -25,6 +25,13 @@ wards/*/examples/
 __WARDEN_EOF__
 mkdir -p .warden/wards/WARD-001
 cat > .warden/wards/WARD-001/ward.md <<'__WARDEN_EOF__'
+---
+source: 'Team engineering review'
+decided: 2026-10-01
+paths:
+  - 'src/**'
+---
+
 # WARD-001: Bound every query that can return many rows
 
 **Description:** List and export queries that load every matching row exhaust memory and time out as data grows.
@@ -54,8 +61,6 @@ const orders = await db.order.findMany({ where: { accountId }, take: limit, skip
 - FAIL when any can return an unbounded number of rows.
 
 **Applicability:** Code that queries collections of records. Exception: tables with a hard, documented size cap, such as enums.
-
-**Human review:** Not required
 __WARDEN_EOF__
 mkdir -p .warden/wards/WARD-001/examples
 cat > .warden/wards/WARD-001/examples/overdue-payments-report.md <<'__WARDEN_EOF__'
@@ -94,6 +99,13 @@ export async function* overduePayments(now: Date) {
 __WARDEN_EOF__
 mkdir -p .warden/wards/WARD-002
 cat > .warden/wards/WARD-002/ward.md <<'__WARDEN_EOF__'
+---
+source: 'Team engineering review'
+decided: 2026-10-01
+paths:
+  - 'src/handlers/**'
+---
+
 # WARD-002: Validate request input at the handler boundary
 
 **Description:** Handlers that pass raw request input to services let malformed or hostile data deep into the system.
@@ -128,8 +140,6 @@ export async function createInvoice(req: Request) {
 - FAIL when any handler uses raw request input.
 
 **Applicability:** HTTP handlers in `src/handlers/`. Exception: handlers that read no request input.
-
-**Human review:** Not required
 __WARDEN_EOF__
 mkdir -p .warden/wards/WARD-002/examples
 cat > .warden/wards/WARD-002/examples/raw-refund-body.md <<'__WARDEN_EOF__'
@@ -172,15 +182,21 @@ Managed with the warden plugin: `/record-ward` adds a ward, `/audit-wards` conso
 
 ## Summary
 
-| ID | Name | Human review |
-|----|------|--------------|
-| [WARD-001](wards/WARD-001/ward.md) | Bound every query that can return many rows | No |
-| [WARD-002](wards/WARD-002/ward.md) | Validate request input at the handler boundary | No |
+| ID | Name | Applies to | Human review |
+|----|------|------------|--------------|
+| [WARD-001](wards/WARD-001/ward.md) | Bound every query that can return many rows | `src/**` | No |
+| [WARD-002](wards/WARD-002/ward.md) | Validate request input at the handler boundary | `src/handlers/**` | No |
 
 ## Retired
 
 | ID | Former name | Outcome |
 |----|-------------|---------|
+__WARDEN_EOF__
+mkdir -p src/handlers
+cat > src/handlers/health.ts <<'__WARDEN_EOF__'
+export async function health() {
+  return { ok: true }
+}
 __WARDEN_EOF__
 git add -A
 git commit -q -m "base"

@@ -70,8 +70,8 @@ disputed, goes to the human instead of another loop.
 
 ## 5. With `--fix`
 
-After each report, apply the **Recommended correction** of every FAIL finding on a ward whose Human
-review is `Not required`, then re-check with a fresh checker and the previous report. Stop when no
+After each report, apply the **Recommended correction** of every FAIL finding on a ward without
+`human-review` questions, then re-check with a fresh checker and the previous report. Stop when no
 such FAIL remains, when a finding survives two attempts, or after three rounds. Never auto-fix:
 
 - findings on wards that require human review;

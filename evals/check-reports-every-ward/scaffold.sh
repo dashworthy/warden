@@ -50,6 +50,13 @@ wards/*/examples/
 __WARDEN_EOF__
 mkdir -p .warden/wards/WARD-001
 cat > .warden/wards/WARD-001/ward.md <<'__WARDEN_EOF__'
+---
+source: 'Team engineering review'
+decided: 2026-10-01
+paths:
+  - 'src/**'
+---
+
 # WARD-001: Bound every query that can return many rows
 
 **Description:** List and export queries that load every matching row exhaust memory and time out as data grows.
@@ -79,8 +86,6 @@ const orders = await db.order.findMany({ where: { accountId }, take: limit, skip
 - FAIL when any can return an unbounded number of rows.
 
 **Applicability:** Code that queries collections of records. Exception: tables with a hard, documented size cap, such as enums.
-
-**Human review:** Not required
 __WARDEN_EOF__
 mkdir -p .warden/wards/WARD-001/examples
 cat > .warden/wards/WARD-001/examples/overdue-payments-report.md <<'__WARDEN_EOF__'
@@ -119,6 +124,13 @@ export async function* overduePayments(now: Date) {
 __WARDEN_EOF__
 mkdir -p .warden/wards/WARD-002
 cat > .warden/wards/WARD-002/ward.md <<'__WARDEN_EOF__'
+---
+source: 'Team engineering review'
+decided: 2026-10-01
+paths:
+  - 'src/handlers/**'
+---
+
 # WARD-002: Validate request input at the handler boundary
 
 **Description:** Handlers that pass raw request input to services let malformed or hostile data deep into the system.
@@ -153,8 +165,6 @@ export async function createInvoice(req: Request) {
 - FAIL when any handler uses raw request input.
 
 **Applicability:** HTTP handlers in `src/handlers/`. Exception: handlers that read no request input.
-
-**Human review:** Not required
 __WARDEN_EOF__
 mkdir -p .warden/wards/WARD-002/examples
 cat > .warden/wards/WARD-002/examples/raw-refund-body.md <<'__WARDEN_EOF__'
@@ -186,6 +196,13 @@ export async function createRefund(req: { body: unknown }) {
 __WARDEN_EOF__
 mkdir -p .warden/wards/WARD-003
 cat > .warden/wards/WARD-003/ward.md <<'__WARDEN_EOF__'
+---
+source: 'Team engineering review'
+decided: 2026-10-01
+paths:
+  - 'migrations/**'
+---
+
 # WARD-003: Make every migration reversible
 
 **Description:** Migrations without a working `down` step can't be rolled back during an incident.
@@ -217,8 +234,6 @@ export async function down(db: Db) {
 - FAIL when any new migration has no `down` or one that doesn't reverse `up`.
 
 **Applicability:** Files under `migrations/`. N/A when the slice adds no migration.
-
-**Human review:** Not required
 __WARDEN_EOF__
 mkdir -p .warden/wards/WARD-003/examples
 cat > .warden/wards/WARD-003/examples/empty-down.md <<'__WARDEN_EOF__'
@@ -263,16 +278,29 @@ Managed with the warden plugin: `/record-ward` adds a ward, `/audit-wards` conso
 
 ## Summary
 
-| ID | Name | Human review |
-|----|------|--------------|
-| [WARD-001](wards/WARD-001/ward.md) | Bound every query that can return many rows | No |
-| [WARD-002](wards/WARD-002/ward.md) | Validate request input at the handler boundary | No |
-| [WARD-003](wards/WARD-003/ward.md) | Make every migration reversible | No |
+| ID | Name | Applies to | Human review |
+|----|------|------------|--------------|
+| [WARD-001](wards/WARD-001/ward.md) | Bound every query that can return many rows | `src/**` | No |
+| [WARD-002](wards/WARD-002/ward.md) | Validate request input at the handler boundary | `src/handlers/**` | No |
+| [WARD-003](wards/WARD-003/ward.md) | Make every migration reversible | `migrations/**` | No |
 
 ## Retired
 
 | ID | Former name | Outcome |
 |----|-------------|---------|
+__WARDEN_EOF__
+mkdir -p migrations
+cat > migrations/20261001_create_invoices.ts <<'__WARDEN_EOF__'
+export async function up(db: Db) {
+  await db.schema.createTable('invoices', (t) => {
+    t.uuid('id').primary()
+    t.uuid('account_id').notNullable()
+  })
+}
+
+export async function down(db: Db) {
+  await db.schema.dropTable('invoices')
+}
 __WARDEN_EOF__
 git add -A
 git commit -q -m "base"
