@@ -311,12 +311,12 @@ Managed with the warden plugin: `/record-ward` adds a ward, `/audit-wards` conso
 
 ## Summary
 
-| ID | Name | Applies to | Human review |
-|----|------|------------|--------------|
-| [WARD-001](wards/WARD-001/ward.md) | Bound every query that can return many rows | `src/**` | No |
-| [WARD-002](wards/WARD-002/ward.md) | Paginate every list endpoint | `src/handlers/**` | No |
-| [WARD-003](wards/WARD-003/ward.md) | Retry every external API call | All | No |
-| [WARD-004](wards/WARD-004/ward.md) | Never retry non-idempotent requests | All | No |
+| ID | Name | Phases | Applies to | Human review |
+|----|------|--------|------------|--------------|
+| [WARD-001](wards/WARD-001/ward.md) | Bound every query that can return many rows | code | `src/**` | No |
+| [WARD-002](wards/WARD-002/ward.md) | Paginate every list endpoint | code | `src/handlers/**` | No |
+| [WARD-003](wards/WARD-003/ward.md) | Retry every external API call | code | All | No |
+| [WARD-004](wards/WARD-004/ward.md) | Never retry non-idempotent requests | code | All | No |
 
 ## Retired
 

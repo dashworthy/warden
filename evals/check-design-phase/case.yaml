@@ -1,0 +1,10 @@
+schema_version: "1.1"
+name: check-design-phase
+expected_outcome: |
+  Checks only the design-phase ward against docs/plans/invoice-export.md. WARD-002 is FAIL: the
+  plan adds a column, writes exported_at and releases in one deploy, but has no Rollback section.
+  The finding cites the plan and recommends a Rollback section covering the migration, the data
+  writes and the deploy. WARD-001, a code ward, is left out of the report. Overall FAIL; edits
+  nothing.
+context:
+  scaffold_script: scaffold.sh

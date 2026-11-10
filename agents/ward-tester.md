@@ -15,7 +15,7 @@ it needs to judge blind.
 - **Read-only.** Never create, edit or delete files. Use Bash only to list files with `ls`:
   `.warden/.ignore` hides example folders from ripgrep, so a search won't find them.
 - **Blind checks.** The checker never sees an example file, an expected fix shape, or which case
-  is meant to pass. Give it only the ward and numbered code cases.
+  is meant to pass. Give it only the ward and numbered cases.
 - **Fresh checkers.** Dispatch a new `warden:ward-checker` for each phase. If that agent type isn't
   available, use a general-purpose agent with the instructions in
   `${CLAUDE_PLUGIN_ROOT}/agents/ward-checker.md` (everything below the frontmatter), told never to

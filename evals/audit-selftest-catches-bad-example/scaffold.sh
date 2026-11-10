@@ -182,10 +182,10 @@ Managed with the warden plugin: `/record-ward` adds a ward, `/audit-wards` conso
 
 ## Summary
 
-| ID | Name | Applies to | Human review |
-|----|------|------------|--------------|
-| [WARD-001](wards/WARD-001/ward.md) | Bound every query that can return many rows | `src/**` | No |
-| [WARD-002](wards/WARD-002/ward.md) | Validate request input at the handler boundary | `src/handlers/**` | No |
+| ID | Name | Phases | Applies to | Human review |
+|----|------|--------|------------|--------------|
+| [WARD-001](wards/WARD-001/ward.md) | Bound every query that can return many rows | code | `src/**` | No |
+| [WARD-002](wards/WARD-002/ward.md) | Validate request input at the handler boundary | code | `src/handlers/**` | No |
 
 ## Retired
 

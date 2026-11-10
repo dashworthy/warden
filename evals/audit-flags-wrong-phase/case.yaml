@@ -1,0 +1,9 @@
+schema_version: "1.1"
+name: audit-flags-wrong-phase
+expected_outcome: |
+  Self-tests both wards. Flags that WARD-002 (link the issue in every PR description) has no
+  `phases`, so it is a code ward, yet its Verification reads the PR body: it belongs in the `pr`
+  phase. Recommends adding `phases: [pr]` and updating its Summary row's Phases to `pr`. Raises no
+  phase problem for WARD-001 and changes nothing without approval.
+context:
+  scaffold_script: scaffold.sh
