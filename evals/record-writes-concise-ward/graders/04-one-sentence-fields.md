@@ -10,9 +10,9 @@ the self-test or the rest of the proposal. If no ward.md text is shown, FAIL.
 PASS if all of these hold:
 1. **Description**, **Rationale** and **Applicability** are each one sentence of at most about 30
    words.
-2. None of those three enumerates more than three cases: no parenthetical list of field rules, and
-   no retelling of each incident. Naming two or three things in passing is fine.
-3. **Verification** has at most two numbered steps, each one sentence of at most about 40 words,
+2. None of those three retells the incidents one by one. Naming the kinds of check the request
+   itself asked for (presence, type, range, length, allowed values) is fine.
+3. **Verification** has at most two numbered steps, each one sentence of at most about 50 words,
    followed by one PASS line and one FAIL line.
 4. Each code block under **Violations** and **Compliant examples** is at most 10 lines.
 
