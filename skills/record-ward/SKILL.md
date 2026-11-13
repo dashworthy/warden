@@ -80,6 +80,9 @@ an Expected fix shape, and the fix, all in the phase's medium.
 
 For Extend or Replace, draft the complete updated ward, and examples for anything it newly covers.
 
+Last, put the draft `ward.md` beside the format's example ward and cut it to that length: each
+field one sentence, no step a previous step already covers, and no incident retold one by one.
+
 ## 5. Self-test the draft
 
 Dispatch `warden:ward-tester` with the draft `ward.md` and its examples as text (they aren't files
