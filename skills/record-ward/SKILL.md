@@ -54,8 +54,12 @@ Write `ward.md` in the registry format: its frontmatter (`phases` only when it i
 the heading with its ID and name, and all six fields. Write Violations and Compliant examples in the
 phase's medium: plan excerpts for `design`, code for `code`, PR text or commit messages for `pr`.
 Take examples from this repository's languages and frameworks; when the concern came from real code,
-use a trimmed version of it as the violation. Make the verification decidable: explicit PASS and
+use only the line or two of it that break the ward as the violation, and those lines fixed as the
+compliant example. Make the verification decidable: explicit PASS and
 FAIL conditions, and an exact command wherever a command can decide.
+
+Keep it as short as the format's example: when the input lists many cases, state the one rule that
+covers them, and when extending a ward, fold the new case into its existing sentences.
 
 Scope **paths** to where the governed code actually lives in this repository: look at the tree
 (`git ls-files`), pick the narrowest globs that cover it, and confirm each matches files with
@@ -75,6 +79,9 @@ different way from its Violations field (for a `code` ward, at a path inside the
 an Expected fix shape, and the fix, all in the phase's medium.
 
 For Extend or Replace, draft the complete updated ward, and examples for anything it newly covers.
+
+Last, put the draft `ward.md` beside the format's example ward and cut it to that length: each
+field one sentence, no step a previous step already covers, and no incident retold one by one.
 
 ## 5. Self-test the draft
 

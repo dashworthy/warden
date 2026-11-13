@@ -41,6 +41,7 @@ Apply the format's consistency rules. Each break becomes a recommendation.
 10. **Source**: a missing `source` or `decided`, or an `until` that may have passed: ask the human whether the ward still holds rather than retiring it yourself.
 11. **Phase**: a ward whose Verification inspects another phase's input (a `code` ward that checks the PR body, a `pr` ward that reviews the code), or whose examples are in the wrong medium.
 12. **Enforcement**: an `enforced-by` file that no longer exists (`git ls-files <file>`), or a test in the repository that checks a ward without being listed in its `enforced-by`.
+13. **Length**: a ward longer than the format's Keep it short allows. Propose the shorter text with every constraint kept.
 
 Preserve intent. Don't drop a meaningful constraint to shrink the count, and never change what a
 ward means except through a recommendation that says so.
@@ -75,6 +76,7 @@ empty sections:
 ### Sources
 ### Phases
 ### Enforcement
+### Length
 ### Consistency
 
 ### Proposed registry changes

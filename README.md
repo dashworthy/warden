@@ -9,7 +9,7 @@ verification procedure, kept in a registry your repository owns.
 | Skill | Does |
 |---|---|
 | `/record-ward` | Turns an instruction, PR comment or review finding into a ward. Checks for overlap, drafts examples and a verification procedure, self-tests the draft, and writes only after you approve. |
-| `/audit-wards` | Self-tests every ward and reviews the registry for overlap, conflicts, ambiguity and overreach, then proposes merges that name the IDs retained and retired. Writes only what you approve. |
+| `/audit-wards` | Self-tests every ward and reviews the registry for overlap, conflicts, ambiguity, overreach and length, then proposes merges that name the IDs retained and retired. Writes only what you approve. |
 | `/check-wards` | Verifies a plan, a slice or a PR against that phase's wards through an independent, read-only checker: PASS, FAIL, N/A or UNVERIFIED for each ward, actionable findings, and the items that need your review. |
 
 Linters check syntax and style. Wards cover what they can't: architecture, engineering standards,
@@ -116,45 +116,36 @@ paths:
 
 # WARD-001: Avoid unnecessary abstractions
 
-**Description:** Interfaces, factories and service layers added for single-use functionality add
-complexity without providing reuse.
+**Description:** Every interface, factory or service layer the code adds serves a real need for a
+second implementation.
 
-**Rationale:** Every layer is more code to read, test and keep in step. An abstraction with one
-implementation and no demonstrated need for another costs that and buys nothing.
+**Rationale:** Each layer is more code to read, test and keep in step, and one with a single
+implementation buys nothing for it.
 
 **Violations:**
 
 ```ts
-interface InvoiceNumberGenerator { next(): string }
-class DefaultInvoiceNumberGenerator implements InvoiceNumberGenerator {
-  next() { return `INV-${Date.now()}` }
-}
-class InvoiceNumberGeneratorFactory {
-  create(): InvoiceNumberGenerator { return new DefaultInvoiceNumberGenerator() }
-}
+class InvoiceNumberFactory { create() { return new DefaultInvoiceNumber() } } // its only implementation
 ```
 
-An interface and a factory for one implementation that nothing else needs.
+A factory for one implementation that nothing else needs.
 
 **Compliant examples:**
 
 ```ts
-export function nextInvoiceNumber(): string {
-  return `INV-${Date.now()}`
-}
+export const nextInvoiceNumber = () => `INV-${Date.now()}`
 ```
 
 **Verification:**
 
-1. List the interfaces, abstract classes, factories and wrapper services the slice adds.
-2. For each, count implementations and look for the requirement it serves: a second
-   implementation, a test seam a test actually uses, or a documented extension point.
+1. For each abstraction the slice adds, find a second implementation, a test seam a test uses, or
+   a documented extension point.
 
-- PASS when every new abstraction serves such a requirement.
-- FAIL when one has a single implementation and no such requirement.
+- PASS when every one has such a need.
+- FAIL when one does not.
 
-**Applicability:** Slices that add interfaces, abstract classes, factories or service wrappers.
-Exception: contracts the framework requires.
+**Applicability:** Slices that add interfaces, abstract classes, factories or service wrappers,
+except contracts the framework requires.
 ````
 
 The `paths` frontmatter, the same format as Claude Code's `.claude/rules/` and Laravel Boost's

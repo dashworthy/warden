@@ -93,14 +93,14 @@ enforced-by:
 
 # WARD-NNN: <imperative name, e.g. "Bound every query that can return many rows">
 
-**Description:** <one or two sentences: the problem this ward prevents>
+**Description:** <one sentence: what holds when the ward is followed>
 
-**Rationale:** <why it matters: what goes wrong, and what it costs, when it's violated>
+**Rationale:** <one sentence: what a violation costs>
 
 **Violations:**
 
 ```php
-// realistic code that violates the ward
+// the shortest realistic code that violates the ward
 ```
 
 <one line: why it violates>
@@ -108,18 +108,62 @@ enforced-by:
 **Compliant examples:**
 
 ```php
-// realistic code that satisfies the ward, in its simplest form
+// the same lines, fixed in their simplest form
 ```
 
 **Verification:**
 
-1. <a step a reviewer performs; the exact command when a command can decide it>
-2. <…>
+1. <the step that settles it; the exact command when a command can decide it>
 
 - PASS when <observable condition>.
 - FAIL when <observable condition>.
 
-**Applicability:** <the code and kinds of change this ward applies to, and explicit exceptions>
+**Applicability:** <one sentence: the code and kinds of change it applies to, and any exception>
+~~~
+
+**Keep it short.** Aim for the length of the ward below: each field and Verification step one
+short sentence (under about 25 words), the violation as few lines as show the problem, and the
+compliant example those lines fixed. State the rule that covers the cases instead of listing them,
+and name the kind of incident rather than each one; the reader can work them out.
+
+An illustration of the length to aim for, not a ward to add:
+
+~~~markdown
+---
+source: 'Review of PR #87 by the platform team'
+decided: 2026-10-14
+paths:
+  - 'src/**'
+---
+
+# WARD-001: Avoid unnecessary abstractions
+
+**Description:** Every interface, factory or service layer the code adds serves a real need for a second implementation.
+
+**Rationale:** Each layer is more code to read, test and keep in step, and one with a single implementation buys nothing for it.
+
+**Violations:**
+
+```ts
+class InvoiceNumberFactory { create() { return new DefaultInvoiceNumber() } } // its only implementation
+```
+
+A factory for one implementation that nothing else needs.
+
+**Compliant examples:**
+
+```ts
+export const nextInvoiceNumber = () => `INV-${Date.now()}`
+```
+
+**Verification:**
+
+1. For each abstraction the slice adds, find a second implementation, a test seam a test uses, or a documented extension point.
+
+- PASS when every one has such a need.
+- FAIL when one does not.
+
+**Applicability:** Slices that add interfaces, abstract classes, factories or service wrappers, except contracts the framework requires.
 ~~~
 
 | Field | What makes it good |
@@ -130,9 +174,9 @@ enforced-by:
 | `paths` | The narrowest globs that cover where the code the ward governs lives (see Paths). Leave `paths` out only for a ward that genuinely applies anywhere in the repository. |
 | `human-review` | One question per entry that a person must answer, listed only when an agent can't settle the ward from the code alone (product or UX judgment, security or data-risk trade-offs, domain facts the code doesn't contain). Leave `human-review` out when an agent can decide. |
 | Name (in the heading) | Imperative, under ten words, naming the principle rather than one instance. |
-| Description | The problem the ward prevents, in plain words. |
+| Description | The rule, stated as what holds when the ward is followed. |
 | Rationale | The concrete cost of a violation: bugs, outages, coupling, review time. |
-| Violations | One to three realistic examples in this repository's languages and frameworks, each with a line on why it violates. Prefer a trimmed version of the real code that prompted the ward. |
+| Violations | One realistic example in this repository's languages and frameworks (a second only for a different way to violate it), with a line on why it violates. Prefer the line or two of the real code that prompted the ward. |
 | Compliant examples | The matching acceptable solutions, in their simplest form: never more elaborate than the problem needs. |
 | Verification | Steps that lead two reviewers to the same verdict, ending in explicit PASS and FAIL conditions. Give the exact command for anything a command can decide; for judgment calls, say what to inspect and what evidence settles it. |
 | Applicability | Enough to mark the ward N/A with confidence among the files its paths match: which kinds of code or change, and the exceptions. Paths say where; Applicability says what. |

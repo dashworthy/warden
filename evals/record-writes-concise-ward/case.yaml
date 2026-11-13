@@ -1,0 +1,9 @@
+schema_version: "1.1"
+name: record-writes-concise-ward
+expected_outcome: |
+  Turns a long, case-by-case request into one short ward: Description, Rationale and
+  Applicability are one sentence each, Verification has at most two steps, the Violations
+  example is a few lines, and the rule as stated still covers every case the request listed.
+  Self-tests the draft and stops for approval without writing any file.
+context:
+  scaffold_script: scaffold.sh
