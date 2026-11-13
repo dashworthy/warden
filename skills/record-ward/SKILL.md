@@ -54,7 +54,8 @@ Write `ward.md` in the registry format: its frontmatter (`phases` only when it i
 the heading with its ID and name, and all six fields. Write Violations and Compliant examples in the
 phase's medium: plan excerpts for `design`, code for `code`, PR text or commit messages for `pr`.
 Take examples from this repository's languages and frameworks; when the concern came from real code,
-use a trimmed version of it as the violation. Make the verification decidable: explicit PASS and
+use only the line or two of it that break the ward as the violation, and those lines fixed as the
+compliant example. Make the verification decidable: explicit PASS and
 FAIL conditions, and an exact command wherever a command can decide.
 
 Keep it as short as the format's example: when the input lists many cases, state the one rule that

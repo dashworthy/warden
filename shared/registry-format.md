@@ -123,51 +123,47 @@ enforced-by:
 
 **Keep it short.** Aim for the length of the ward below: each field and Verification step one
 short sentence (under about 25 words), the violation as few lines as show the problem, and the
-compliant example those lines fixed. State the rule that covers the cases instead of listing them;
-the reader can work them out.
+compliant example those lines fixed. State the rule that covers the cases instead of listing them,
+and name the kind of incident rather than each one; the reader can work them out.
 
 An illustration of the length to aim for, not a ward to add:
 
 ~~~markdown
 ---
-source: 'Review of PR #57: blank and over-long labels reached the database'
-decided: 2026-11-13
+source: 'Review of PR #87 by the platform team'
+decided: 2026-10-14
 paths:
-  - 'src/Form/**'
-  - 'src/Controller/**'
+  - 'src/**'
 ---
 
-# WARD-001: Validate every form field on the server
+# WARD-001: Avoid unnecessary abstractions
 
-**Description:** Every field or parameter a controller accepts has a server-side constraint for each bad value it can receive.
+**Description:** Every interface, factory or service layer the code adds serves a real need for a second implementation.
 
-**Rationale:** A field without one saves bad data or crashes with a 500, as blank and too-long labels did.
+**Rationale:** Each layer is more code to read, test and keep in step, and one with a single implementation buys nothing for it.
 
 **Violations:**
 
-```php
-$builder->add('label', TextType::class); // column string(255) NOT NULL, setLabel(string)
+```ts
+class InvoiceNumberFactory { create() { return new DefaultInvoiceNumber() } } // its only implementation
 ```
 
-A blank or 300-character `label` reaches the database or the typed setter unchecked.
+A factory for one implementation that nothing else needs.
 
 **Compliant examples:**
 
-```php
-$builder->add('label', TextType::class, [
-    'empty_data'  => '',
-    'constraints' => [new NotBlank(), new Length(['max' => 255])],
-]);
+```ts
+export const nextInvoiceNumber = () => `INV-${Date.now()}`
 ```
 
 **Verification:**
 
-1. For each field or request parameter the diff adds or changes, find the constraint (form option or `validation.yml`) that rejects each value its column or setter cannot take.
+1. For each abstraction the slice adds, find a second implementation, a test seam a test uses, or a documented extension point.
 
-- PASS when every such value has a constraint.
+- PASS when every one has such a need.
 - FAIL when one does not.
 
-**Applicability:** Symfony form types and the controllers that read their fields or request parameters; N/A for fields the change does not touch.
+**Applicability:** Slices that add interfaces, abstract classes, factories or service wrappers, except contracts the framework requires.
 ~~~
 
 | Field | What makes it good |
@@ -180,7 +176,7 @@ $builder->add('label', TextType::class, [
 | Name (in the heading) | Imperative, under ten words, naming the principle rather than one instance. |
 | Description | The rule, stated as what holds when the ward is followed. |
 | Rationale | The concrete cost of a violation: bugs, outages, coupling, review time. |
-| Violations | One realistic example in this repository's languages and frameworks (a second only for a different way to violate it), with a line on why it violates. Prefer a trimmed version of the real code that prompted the ward. |
+| Violations | One realistic example in this repository's languages and frameworks (a second only for a different way to violate it), with a line on why it violates. Prefer the line or two of the real code that prompted the ward. |
 | Compliant examples | The matching acceptable solutions, in their simplest form: never more elaborate than the problem needs. |
 | Verification | Steps that lead two reviewers to the same verdict, ending in explicit PASS and FAIL conditions. Give the exact command for anything a command can decide; for judgment calls, say what to inspect and what evidence settles it. |
 | Applicability | Enough to mark the ward N/A with confidence among the files its paths match: which kinds of code or change, and the exceptions. Paths say where; Applicability says what. |
