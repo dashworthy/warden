@@ -148,9 +148,6 @@ export const nextInvoiceNumber = () => `INV-${Date.now()}`
 except contracts the framework requires.
 ````
 
-Each field is one sentence where it can be. A ward a person takes in at a glance is one an agent
-applies consistently, so warden states the rule and trusts the reader with the cases.
-
 The `paths` frontmatter, the same format as Claude Code's `.claude/rules/` and Laravel Boost's
 `.ai/rules/`, scopes the ward to the files it governs. The checker matches it against the slice
 with `git diff -- ':(glob)…'`, so a ward whose paths match no changed file is N/A without anyone

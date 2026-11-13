@@ -1,6 +1,6 @@
 ---
 name: audit-wards
-description: "Audit this repository's ward registry, .warden/, for wards that overlap, contradict each other, are ambiguous, too broad or too restrictive, lack good examples or verification, run longer than they need, duplicate automated tooling, or have the wrong human-review setting; self-test every ward against its examples; then propose consolidations that name the ward IDs retained and retired. Report-only until a human approves specific changes. Use when asked to review, clean up, consolidate, dedupe, simplify or sanity-check the wards or engineering standards, or periodically as the registry grows."
+description: "Audit this repository's ward registry, .warden/, for wards that overlap, contradict each other, are ambiguous, too broad or too restrictive, lack good examples or verification, duplicate automated tooling, or have the wrong human-review setting; self-test every ward against its examples; then propose consolidations that name the ward IDs retained and retired. Report-only until a human approves specific changes. Use when asked to review, clean up, consolidate, dedupe, simplify or sanity-check the wards or engineering standards, or periodically as the registry grows."
 ---
 
 # Audit wards
@@ -41,7 +41,7 @@ Apply the format's consistency rules. Each break becomes a recommendation.
 10. **Source**: a missing `source` or `decided`, or an `until` that may have passed: ask the human whether the ward still holds rather than retiring it yourself.
 11. **Phase**: a ward whose Verification inspects another phase's input (a `code` ward that checks the PR body, a `pr` ward that reviews the code), or whose examples are in the wrong medium.
 12. **Enforcement**: an `enforced-by` file that no longer exists (`git ls-files <file>`), or a test in the repository that checks a ward without being listed in its `enforced-by`.
-13. **Length**: against the format's Keep it short, a field longer than one short sentence or packed with a list of cases, Verification steps that could be one, or a Violations example longer than the problem needs, where the extra text carries nothing new. Propose the shorter text with every constraint kept.
+13. **Length**: a ward longer than the format's Keep it short allows. Propose the shorter text with every constraint kept.
 
 Preserve intent. Don't drop a meaningful constraint to shrink the count, and never change what a
 ward means except through a recommendation that says so.

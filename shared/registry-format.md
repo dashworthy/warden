@@ -108,7 +108,7 @@ enforced-by:
 **Compliant examples:**
 
 ```php
-// the same code, fixed in its simplest form
+// the same lines, fixed in their simplest form
 ```
 
 **Verification:**
@@ -121,13 +121,54 @@ enforced-by:
 **Applicability:** <one sentence: the code and kinds of change it applies to, and any exception>
 ~~~
 
-**Keep it short.** Write each field as one short sentence where you can (under about 25 words),
-and each example in as few lines as show the problem (one line with a comment is often enough).
-State the principle and the evidence that settles it, and trust the reader to work out the cases:
-don't pack them into the sentence as a list, and don't retell the incident. A ward a person takes
-in at a glance is one an agent applies consistently. Add a sentence, a step or an example only when
-it carries something the others can't, such as a command that decides the ward or a different way
-to violate it.
+**Keep it short.** Aim for the length of the ward below: each field and Verification step one
+short sentence (under about 25 words), the violation as few lines as show the problem, and the
+compliant example those lines fixed. State the rule that covers the cases instead of listing them;
+the reader can work them out.
+
+An illustration of the length to aim for, not a ward to add:
+
+~~~markdown
+---
+source: 'Review of PR #57: blank and over-long labels reached the database'
+decided: 2026-11-13
+paths:
+  - 'src/Form/**'
+  - 'src/Controller/**'
+---
+
+# WARD-001: Validate every form field on the server
+
+**Description:** Every field or parameter a controller accepts has a server-side constraint for each bad value it can receive.
+
+**Rationale:** A field without one saves bad data or crashes with a 500, as blank and too-long labels did.
+
+**Violations:**
+
+```php
+$builder->add('label', TextType::class); // column string(255) NOT NULL, setLabel(string)
+```
+
+A blank or 300-character `label` reaches the database or the typed setter unchecked.
+
+**Compliant examples:**
+
+```php
+$builder->add('label', TextType::class, [
+    'empty_data'  => '',
+    'constraints' => [new NotBlank(), new Length(['max' => 255])],
+]);
+```
+
+**Verification:**
+
+1. For each field or request parameter the diff adds or changes, find the constraint (form option or `validation.yml`) that rejects each value its column or setter cannot take.
+
+- PASS when every such value has a constraint.
+- FAIL when one does not.
+
+**Applicability:** Symfony form types and the controllers that read their fields or request parameters; N/A for fields the change does not touch.
+~~~
 
 | Field | What makes it good |
 |---|---|
@@ -137,12 +178,12 @@ to violate it.
 | `paths` | The narrowest globs that cover where the code the ward governs lives (see Paths). Leave `paths` out only for a ward that genuinely applies anywhere in the repository. |
 | `human-review` | One question per entry that a person must answer, listed only when an agent can't settle the ward from the code alone (product or UX judgment, security or data-risk trade-offs, domain facts the code doesn't contain). Leave `human-review` out when an agent can decide. |
 | Name (in the heading) | Imperative, under ten words, naming the principle rather than one instance. |
-| Description | The rule in one sentence, stated as what holds: "Every query that can return many rows has a limit." |
-| Rationale | The concrete cost of a violation in one sentence, naming the incident that prompted the ward (when there was one) in a few words. |
-| Violations | Usually one realistic example in this repository's languages and frameworks, as short as shows the problem, with a line on why it violates. Prefer a trimmed version of the real code that prompted the ward; add a second only for a different way to violate it. |
-| Compliant examples | The same code fixed, in its simplest form: never more elaborate than the problem needs. |
-| Verification | As few steps as settle it, often one, ending in one PASS and one FAIL condition that lead two reviewers to the same verdict. Give the exact command for anything a command can decide; for judgment calls, say what to inspect and what evidence settles it. |
-| Applicability | One sentence that's enough to mark the ward N/A with confidence among the files its paths match: which kinds of code or change, and the exceptions. Paths say where; Applicability says what. |
+| Description | The rule, stated as what holds when the ward is followed. |
+| Rationale | The concrete cost of a violation: bugs, outages, coupling, review time. |
+| Violations | One realistic example in this repository's languages and frameworks (a second only for a different way to violate it), with a line on why it violates. Prefer a trimmed version of the real code that prompted the ward. |
+| Compliant examples | The matching acceptable solutions, in their simplest form: never more elaborate than the problem needs. |
+| Verification | Steps that lead two reviewers to the same verdict, ending in explicit PASS and FAIL conditions. Give the exact command for anything a command can decide; for judgment calls, say what to inspect and what evidence settles it. |
+| Applicability | Enough to mark the ward N/A with confidence among the files its paths match: which kinds of code or change, and the exceptions. Paths say where; Applicability says what. |
 | `enforced-by` | Test files in this repository that check all or part of the ward, such as an architecture test. The checker runs them; the body still says what the ward requires and why, so an agent can comply before a test fails. A ward that a test or tool enforces completely, with nothing for an agent to learn from it, is not a ward. |
 
 ## Phases
