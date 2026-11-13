@@ -45,6 +45,9 @@ commits: it brings those corrections to you.
 - It never receives "I fixed it" claims, only the previous report, and confirms each fix in the code.
 - An empty registry reports **UNVERIFIED**, never PASS.
 - `--fix` applies the corrections that don't need human review and re-checks, up to three rounds.
+- `--per-ward` gives each ward its own checker, run in parallel, and merges their rows into one
+  report. Each ward gets a checker's full attention, at one checker run per ward; wards whose
+  `paths` match nothing are N/A without one.
 
 ## Install
 
@@ -62,6 +65,7 @@ commits: it brings those corrections to you.
 /check-wards --fix main..HEAD
 /check-wards --phase design docs/plans/invoices.md
 /check-wards --phase pr
+/check-wards --per-ward
 ```
 
 ## Add it to your workflow

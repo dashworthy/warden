@@ -1,7 +1,7 @@
 ---
 name: check-wards
-description: "Verify an implementation slice, a design or plan document, or a pull request against the matching phase's wards (enforceable engineering standards) in this repository's ward registry, .warden/, through an independent read-only checker subagent. Returns a PASS / FAIL / N/A / UNVERIFIED summary covering every ward in that phase, actionable findings, and the items that need human review. Use after finishing an implementation slice and before asking for human approval, on a plan before implementing it (--phase design), before opening or merging a PR (--phase pr), when re-verifying fixes to earlier findings, or whenever asked to check changes against the project's wards or standards. Pass --fix to apply corrections that don't need human review and re-check automatically. Not for running tool linters such as ESLint, PHPStan or Ruff."
-argument-hint: "[--phase design|code|pr] [--fix] [scope: commit range, paths, plan file, or PR]"
+description: "Verify an implementation slice, a design or plan document, or a pull request against the matching phase's wards (enforceable engineering standards) in this repository's ward registry, .warden/, through an independent read-only checker subagent. Returns a PASS / FAIL / N/A / UNVERIFIED summary covering every ward in that phase, actionable findings, and the items that need human review. Use after finishing an implementation slice and before asking for human approval, on a plan before implementing it (--phase design), before opening or merging a PR (--phase pr), when re-verifying fixes to earlier findings, or whenever asked to check changes against the project's wards or standards. Pass --fix to apply corrections that don't need human review and re-check automatically. Pass --per-ward to give each ward its own checker subagent, run in parallel, for large registries or when each ward needs a checker's full attention. Not for running tool linters such as ESLint, PHPStan or Ruff."
+argument-hint: "[--phase design|code|pr] [--fix] [--per-ward] [scope: commit range, paths, plan file, or PR]"
 ---
 
 # Check wards
@@ -13,7 +13,8 @@ context you scope the input, dispatch the checker, hand its report back unchange
 fix loop.
 
 **Arguments:** `--phase design|code|pr` picks the phase, `code` by default. `--fix` turns on
-automatic fixes (step 5). Anything else is the scope: a commit range (`main..HEAD`), paths or a
+automatic fixes (step 5). `--per-ward` gives each ward its own checker (step 2). Anything else is
+the scope: a commit range (`main..HEAD`), paths or a
 slice description for `code`; the document for `design`; a PR number or branch for `pr`.
 
 ## 1. Scope the input
@@ -59,6 +60,37 @@ Dispatch `warden:ward-checker`, a new instance for every check, with:
 If the `warden:ward-checker` agent type isn't available, dispatch a general-purpose agent instead:
 give it the instructions in `${CLAUDE_PLUGIN_ROOT}/agents/ward-checker.md` (everything below the
 frontmatter) with the items above, and tell it never to edit files.
+
+### With `--per-ward`
+
+Each ward gets its own fresh checker, so it has the checker's whole context and attention, and one
+ward's reasoning can't bleed into another's. It costs one checker run per dispatched ward instead
+of one in total.
+
+1. **List the phase's wards.** Read only the frontmatter of each `wards/WARD-NNN/ward.md`, and keep
+   the wards in the scope brief's phase (a ward without `phases` is a `code` ward). With none, run
+   the single checker as above: it returns the no-wards report.
+2. **Settle paths with git.** For `code` and `pr`, run the paths step from the registry format for
+   each ward with `paths`. A ward whose paths match no file in the input is **N/A**: git decided
+   that, so it needs no checker. Don't judge anything else here.
+3. **Confirm the cost.** With more than 10 wards left to dispatch, say how many checker runs the
+   check needs and ask before starting (with no human to ask, run them).
+4. **Dispatch one checker per remaining ward**, all in one message so they run in parallel. Give
+   each the items above plus "Check only WARD-NNN", naming that ward and no other, and on a
+   re-check only that ward's rows and findings from the previous report.
+5. **Merge the reports** into one report in the checker's format, in ID order:
+   - one summary row per ward: each checker's row exactly as returned, and an N/A row for each
+     ward settled by paths;
+   - totals counted from those rows, and **Overall: PASS** only when every row is PASS or N/A and
+     every earlier finding is Resolved;
+   - each checker's Earlier findings, Findings and Human review entries copied unchanged, and its
+     Registry issues listed once each.
+
+   Merging is assembly, not judgment: don't reword, re-rank or overrule a checker's result. A
+   checker that returns no usable report makes its ward UNVERIFIED.
+
+Re-checks in the fix loop (steps 4 and 5) use `--per-ward` again, across every ward in the phase:
+a fix for one ward can break another.
 
 Don't evaluate wards in this context: you may have written the code, and the point is an
 independent verdict. If you can't dispatch a subagent here (for example, you're a subagent at the

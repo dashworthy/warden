@@ -35,6 +35,7 @@ against a no-plugin baseline, so every number says what warden adds over plain C
 | `check-pr-phase-fix-hands-over` | With `--fix`, a pr-phase check hands the commit-subject correction to the human: no amend, rebase, push or file edit. |
 | `check-empty-phase-unverified` | A design check with no design wards reports UNVERIFIED, never PASS, and doesn't apply the code ward. |
 | `check-design-phase` | `--phase design` checks a plan against the design ward: a missing rollback section fails with an actionable finding, and the code ward is left out. |
+| `check-per-ward-dispatch` | `--per-ward` settles the path-N/A ward with git, gives each other ward its own checker naming only that ward, and merges one report with every row, totals and overall FAIL. |
 | `check-empty-registry-unverified` | An empty registry reports UNVERIFIED, never PASS. |
 | `check-fix-holds-human-review` | `--fix` corrects the finding that doesn't need human review, re-checks, and hands the human-review ward to the human untouched. |
 
