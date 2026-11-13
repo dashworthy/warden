@@ -57,6 +57,13 @@ Take examples from this repository's languages and frameworks; when the concern 
 use a trimmed version of it as the violation. Make the verification decidable: explicit PASS and
 FAIL conditions, and an exact command wherever a command can decide.
 
+Follow the format's **Keep it short**: one short sentence per field where you can, one short
+violation, and one Verification step when one settles it. Cut any sentence that restates another,
+lists cases a reader can work out from the rule, or explains what the code already shows. When the
+input lists many cases, state the rule that covers them all, and don't enumerate them anywhere: not
+in a parenthetical, not in the Rationale, not in the Verification. Extending a ward doesn't mean
+lengthening it: fold the new case into the existing sentences where you can.
+
 Scope **paths** to where the governed code actually lives in this repository: look at the tree
 (`git ls-files`), pick the narrowest globs that cover it, and confirm each matches files with
 `git ls-files -- ':(glob)<path>'`. Never fall back to a broad `src/**` or `app/**` when a subtree

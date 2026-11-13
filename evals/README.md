@@ -13,6 +13,7 @@ against a no-plugin baseline, so every number says what warden adds over plain C
 | `record-new-ward-creates-registry` | Drafts WARD-001 in full with an example, self-tests it with the ward-tester, says `.warden/` will be created, and writes nothing before approval. |
 | `record-extends-existing-ward` | Extends the existing WARD-001 instead of adding a near-duplicate ward. |
 | `record-picks-pr-phase` | Drafts a "link the issue in every PR" ward with `phases: [pr]` and PR-description examples, not code. |
+| `record-writes-concise-ward` | Turns a long, case-by-case request into a ward with one short sentence each for Description, Rationale and Applicability (no packed lists of cases), at most two Verification steps and short code, whose rule still covers every listed case. |
 | `record-rejects-linter-duplicate` | Declines a ward that ESLint's `no-console` rule already enforces. |
 
 **`/audit-wards`**

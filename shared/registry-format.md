@@ -93,14 +93,14 @@ enforced-by:
 
 # WARD-NNN: <imperative name, e.g. "Bound every query that can return many rows">
 
-**Description:** <one or two sentences: the problem this ward prevents>
+**Description:** <one sentence: what holds when the ward is followed>
 
-**Rationale:** <why it matters: what goes wrong, and what it costs, when it's violated>
+**Rationale:** <one sentence: what a violation costs>
 
 **Violations:**
 
 ```php
-// realistic code that violates the ward
+// the shortest realistic code that violates the ward
 ```
 
 <one line: why it violates>
@@ -108,19 +108,26 @@ enforced-by:
 **Compliant examples:**
 
 ```php
-// realistic code that satisfies the ward, in its simplest form
+// the same code, fixed in its simplest form
 ```
 
 **Verification:**
 
-1. <a step a reviewer performs; the exact command when a command can decide it>
-2. <…>
+1. <the step that settles it; the exact command when a command can decide it>
 
 - PASS when <observable condition>.
 - FAIL when <observable condition>.
 
-**Applicability:** <the code and kinds of change this ward applies to, and explicit exceptions>
+**Applicability:** <one sentence: the code and kinds of change it applies to, and any exception>
 ~~~
+
+**Keep it short.** Write each field as one short sentence where you can (under about 25 words),
+and each example in as few lines as show the problem (one line with a comment is often enough).
+State the principle and the evidence that settles it, and trust the reader to work out the cases:
+don't pack them into the sentence as a list, and don't retell the incident. A ward a person takes
+in at a glance is one an agent applies consistently. Add a sentence, a step or an example only when
+it carries something the others can't, such as a command that decides the ward or a different way
+to violate it.
 
 | Field | What makes it good |
 |---|---|
@@ -130,12 +137,12 @@ enforced-by:
 | `paths` | The narrowest globs that cover where the code the ward governs lives (see Paths). Leave `paths` out only for a ward that genuinely applies anywhere in the repository. |
 | `human-review` | One question per entry that a person must answer, listed only when an agent can't settle the ward from the code alone (product or UX judgment, security or data-risk trade-offs, domain facts the code doesn't contain). Leave `human-review` out when an agent can decide. |
 | Name (in the heading) | Imperative, under ten words, naming the principle rather than one instance. |
-| Description | The problem the ward prevents, in plain words. |
-| Rationale | The concrete cost of a violation: bugs, outages, coupling, review time. |
-| Violations | One to three realistic examples in this repository's languages and frameworks, each with a line on why it violates. Prefer a trimmed version of the real code that prompted the ward. |
-| Compliant examples | The matching acceptable solutions, in their simplest form: never more elaborate than the problem needs. |
-| Verification | Steps that lead two reviewers to the same verdict, ending in explicit PASS and FAIL conditions. Give the exact command for anything a command can decide; for judgment calls, say what to inspect and what evidence settles it. |
-| Applicability | Enough to mark the ward N/A with confidence among the files its paths match: which kinds of code or change, and the exceptions. Paths say where; Applicability says what. |
+| Description | The rule in one sentence, stated as what holds: "Every query that can return many rows has a limit." |
+| Rationale | The concrete cost of a violation in one sentence, naming the incident that prompted the ward (when there was one) in a few words. |
+| Violations | Usually one realistic example in this repository's languages and frameworks, as short as shows the problem, with a line on why it violates. Prefer a trimmed version of the real code that prompted the ward; add a second only for a different way to violate it. |
+| Compliant examples | The same code fixed, in its simplest form: never more elaborate than the problem needs. |
+| Verification | As few steps as settle it, often one, ending in one PASS and one FAIL condition that lead two reviewers to the same verdict. Give the exact command for anything a command can decide; for judgment calls, say what to inspect and what evidence settles it. |
+| Applicability | One sentence that's enough to mark the ward N/A with confidence among the files its paths match: which kinds of code or change, and the exceptions. Paths say where; Applicability says what. |
 | `enforced-by` | Test files in this repository that check all or part of the ward, such as an architecture test. The checker runs them; the body still says what the ward requires and why, so an agent can comply before a test fails. A ward that a test or tool enforces completely, with nothing for an agent to learn from it, is not a ward. |
 
 ## Phases
