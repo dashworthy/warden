@@ -1,6 +1,6 @@
 {
   "name": "warden",
-  "version": "0.3.0",
+  "version": "0.4.0",
   "description": "Record, audit and enforce your repository's own engineering standards. Each standard is a ward: /record-ward adds one after approval, /audit-wards consolidates them, and /check-wards verifies every implementation slice through an independent, read-only checker.",
   "author": {
     "name": "Andrew Leach",

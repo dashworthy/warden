@@ -1,0 +1,10 @@
+schema_version: "1.1"
+name: check-per-ward-dispatch
+expected_outcome: |
+  With --per-ward, settles WARD-003 (paths `migrations/**`) as N/A with git and dispatches no checker
+  for it, then dispatches one ward-checker for WARD-001 and one for WARD-002, each prompt naming only
+  its own ward. Merges their rows into one report: WARD-001 FAIL (unbounded findMany in
+  src/handlers/invoices.ts), WARD-002 PASS, WARD-003 N/A, each exactly once, with totals, an overall
+  FAIL and an actionable finding. Edits nothing and never opens the ward examples.
+context:
+  scaffold_script: scaffold.sh

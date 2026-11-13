@@ -29,6 +29,10 @@ the implementer does, from your report.
 
 ## Procedure
 
+When your prompt says to check only one ward (`/check-wards --per-ward` dispatched you), the steps
+below cover that ward alone: read the index and only its `ward.md`, report its single row, and
+leave other wards' registry issues to a full check.
+
 1. **Read the registry** at the location in your prompt, or `<git root>/.warden/`: the index
    `wards.md` and every `wards/WARD-NNN/ward.md`. If there are no ward folders, return the
    empty-registry report below. Then keep only the wards in the scope brief's phase (`code` when
