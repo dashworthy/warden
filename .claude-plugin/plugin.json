@@ -1,7 +1,7 @@
 {
   "name": "warden",
-  "version": "0.8.0",
-  "description": "Record, audit and enforce your repository's own engineering standards. Each standard is a ward: /record-ward adds one after approval, /audit-wards consolidates them, and /check-wards verifies every implementation slice through an independent, read-only checker. /create-verify-skill generates a project skill that drives the real app, /verify-change proves a change with evidence, and /maintain-verify-skill keeps its feature map honest.",
+  "version": "0.9.0",
+  "description": "Record, audit and enforce your repository's own engineering standards as rules: /record-rule adds one after approval, /audit-rules consolidates them, and /check-rules verifies every implementation slice through an independent, read-only checker. /create-verify-skill generates a project skill that drives the real app, /verify-change proves a change with evidence, and /maintain-verify-skill keeps its feature map honest.",
   "author": {
     "name": "Andrew Leach",
     "email": "7387639+andyleach@users.noreply.github.com"
@@ -13,7 +13,7 @@
     "code-quality",
     "engineering-standards",
     "review",
-    "wards",
+    "rules",
     "subagents",
     "slices",
     "verification",

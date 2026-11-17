@@ -42,10 +42,10 @@ export function chargeCustomer(id: string, cents: number) {
 __WARDEN_EOF__
 mkdir -p .warden
 cat > .warden/.ignore <<'__WARDEN_EOF__'
-wards/*/examples/
+rules/*/examples/
 __WARDEN_EOF__
-mkdir -p .warden/wards/WARD-001
-cat > .warden/wards/WARD-001/ward.md <<'__WARDEN_EOF__'
+mkdir -p .warden/rules/RULE-001
+cat > .warden/rules/RULE-001/rule.md <<'__WARDEN_EOF__'
 ---
 source: 'Team engineering review'
 decided: 2026-10-01
@@ -53,7 +53,7 @@ paths:
   - 'src/**'
 ---
 
-# WARD-001: Bound every query that can return many rows
+# RULE-001: Bound every query that can return many rows
 
 **Description:** List and export queries that load every matching row exhaust memory and time out as data grows.
 
@@ -83,8 +83,8 @@ const orders = await db.order.findMany({ where: { accountId }, take: limit, skip
 
 **Applicability:** Code that queries collections of records. Exception: tables with a hard, documented size cap, such as enums.
 __WARDEN_EOF__
-mkdir -p .warden/wards/WARD-001/examples
-cat > .warden/wards/WARD-001/examples/overdue-payments-report.md <<'__WARDEN_EOF__'
+mkdir -p .warden/rules/RULE-001/examples
+cat > .warden/rules/RULE-001/examples/overdue-payments-report.md <<'__WARDEN_EOF__'
 # Overdue payments report
 
 ## Sample
@@ -119,22 +119,22 @@ export async function* overduePayments(now: Date) {
 ```
 __WARDEN_EOF__
 mkdir -p .warden
-cat > .warden/wards.md <<'__WARDEN_EOF__'
-# Wards
+cat > .warden/rules.md <<'__WARDEN_EOF__'
+# Rules
 
-Engineering standards for this repository. Each ward is one enforceable standard with its own
-folder in `wards/`, checked against every implementation slice by an independent reviewer.
-Managed with the warden plugin: `/record-ward` adds a ward, `/audit-wards` consolidates them,
-`/check-wards` verifies a slice.
+Engineering standards for this repository. Each rule is one enforceable standard with its own
+folder in `rules/`, checked against every implementation slice by an independent reviewer.
+Managed with the warden plugin: `/record-rule` adds a rule, `/audit-rules` consolidates them,
+`/check-rules` verifies a slice.
 
-<!-- One Summary row per folder in wards/, in ID order. IDs are permanent: never renumber or
+<!-- One Summary row per folder in rules/, in ID order. IDs are permanent: never renumber or
      reuse one. Retired IDs stay listed under Retired. -->
 
 ## Summary
 
 | ID | Name | Applies to | Human review |
 |----|------|------------|--------------|
-| [WARD-001](wards/WARD-001/ward.md) | Bound every query that can return many rows | `src/**` | No |
+| [RULE-001](rules/RULE-001/rule.md) | Bound every query that can return many rows | `src/**` | No |
 
 ## Retired
 

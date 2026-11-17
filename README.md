@@ -4,32 +4,32 @@
 
 A Claude Code plugin that keeps your repository's own engineering standards, enforces them on
 every implementation slice, and proves each change works in the running app. Each standard is a
-**ward**: one enforceable rule with examples and a verification procedure, kept in a registry your
+**rule**: enforceable, with examples and a verification procedure, kept in a registry your
 repository owns. Each proof runs through a **verify skill**: a project-local recipe for launching
 and driving your app, with a map of its features.
 
 | Skill | Does |
 |---|---|
-| `/record-ward` | Turns an instruction, PR comment or review finding into a ward. Checks for overlap, drafts examples and a verification procedure, self-tests the draft, and writes only after you approve. |
-| `/audit-wards` | Self-tests every ward and reviews the registry for overlap, conflicts, ambiguity, overreach and length, then proposes merges that name the IDs retained and retired. Writes only what you approve. |
-| `/check-wards` | Verifies a slice against every ward through an independent, read-only checker: PASS, FAIL, N/A or UNVERIFIED for each ward, actionable findings, and the items that need your review. |
+| `/record-rule` | Turns an instruction, PR comment or review finding into a rule. Checks for overlap, drafts examples and a verification procedure, self-tests the draft, and writes only after you approve. |
+| `/audit-rules` | Self-tests every rule and reviews the registry for overlap, conflicts, ambiguity, overreach and length, then proposes merges that name the IDs retained and retired. Writes only what you approve. |
+| `/check-rules` | Verifies a slice against every rule through an independent, read-only checker: PASS, FAIL, N/A or UNVERIFIED for each rule, actionable findings, and the items that need your review. |
 | `/create-verify-skill` | Reads the repo and writes `.claude/skills/verify-<app>/`: exact Launch, Doctor, Drive, Evidence and Cleanup sections, plus a feature map. Proves the generated skill once end to end before handing it over. |
 | `/verify-change` | States a falsifiable finish condition, drives every mapped feature the change reaches in the running app, and reports pass, fail or inconclusive with commands and evidence paths. Claude also loads it on its own before calling a change done. |
 | `/maintain-verify-skill` | Keeps the verify skill honest: one read-only source reader per feature, one live pass driving every feature, then `clean`, `changed` (one PR of proven map fixes) or `blocked`. Never edits product code. |
 
-Linters check syntax and style. Wards cover what they can't: architecture, engineering standards
+Linters check syntax and style. Rules cover what they can't: architecture, engineering standards
 and implementation quality.
 
 ## How a check works
 
 ```
-/check-wards                            warden:ward-checker (new each run, read-only)
-  scope the slice  ───────────────────▶   read .warden/, list every ward
+/check-rules                            warden:rule-checker (new each run, read-only)
+  scope the slice  ───────────────────▶   read .warden/, list every rule
   attach the previous report               paths match no changed file → N/A (git decides)
                                            PASS / FAIL / N/A / UNVERIFIED, with evidence
                                            re-verify each earlier finding itself
   hand the report to the implementer ◀──   summary table, findings, human-review items
-  fix → /check-wards again
+  fix → /check-rules again
   PASS → human-review items → your approval
 ```
 
@@ -37,13 +37,13 @@ and implementation quality.
 - It never receives "I fixed it" claims, only the previous report, and confirms each fix in the code.
 - An empty registry reports **UNVERIFIED**, never PASS.
 - `--fix` applies the corrections that don't need human review and re-checks, up to three rounds.
-- `--per-ward` gives each ward its own checker, run in parallel, and merges their rows into one
-  report. Each ward gets a checker's full attention, at one checker run per ward; wards whose
+- `--per-rule` gives each rule its own checker, run in parallel, and merges their rows into one
+  report. Each rule gets a checker's full attention, at one checker run per rule; rules whose
   `paths` match nothing are N/A without one.
 
 ## How verification works
 
-Wards check the code. Verification checks the app: "it compiles" is not evidence.
+Rules check the code. Verification checks the app: "it compiles" is not evidence.
 
 ```
 /create-verify-skill ──▶ .claude/skills/verify-<app>/       (commit it)
@@ -73,11 +73,11 @@ Wards check the code. Verification checks the app: "it compiles" is not evidence
 ## Usage
 
 ```
-/record-ward PR feedback: list endpoints keep loading every row; always paginate
-/audit-wards
-/check-wards
-/check-wards --fix main..HEAD
-/check-wards --per-ward
+/record-rule PR feedback: list endpoints keep loading every row; always paginate
+/audit-rules
+/check-rules
+/check-rules --fix main..HEAD
+/check-rules --per-rule
 /create-verify-skill
 /verify-change the bulk-archive action; show screenshots as proof
 /maintain-verify-skill
@@ -88,12 +88,12 @@ Wards check the code. Verification checks the app: "it compiles" is not evidence
 Paste into the project's `CLAUDE.md` or `AGENTS.md`:
 
 ```markdown
-## Wards
-- Before planning or editing a file, open `.warden/wards.md` and read every ward whose Applies to
-  matches the file's path (`All` matches every path). Then grep `.warden/wards` for the feature's
-  key terms to catch wards a path match misses. Follow them as you write the code.
-- After each implementation slice, run `/check-wards` (`--fix` applies fixes that don't need human review).
-- Fix every FAIL and UNVERIFIED finding, then run `/check-wards` again until it reports PASS.
+## Warden rules
+- Before planning or editing a file, open `.warden/rules.md` and read every rule whose Applies to
+  matches the file's path (`All` matches every path). Then grep `.warden/rules` for the feature's
+  key terms to catch rules a path match misses. Follow them as you write the code.
+- After each implementation slice, run `/check-rules` (`--fix` applies fixes that don't need human review).
+- Fix every FAIL and UNVERIFIED finding, then run `/check-rules` again until it reports PASS.
 - Bring me any human-review items, then stop for my approval before starting the next slice.
 
 ## Verification
@@ -102,23 +102,23 @@ Paste into the project's `CLAUDE.md` or `AGENTS.md`:
 
 ## The registry
 
-Each repository keeps its wards in `.warden/`, which you commit with your code:
+Each repository keeps its rules in `.warden/`, which you commit with your code:
 
 ```
 .warden/
 ├── .ignore                        keeps examples out of code searches
-├── wards.md                       index: every ward (linked), the paths it applies to,
+├── rules.md                       index: every rule (linked), the paths it applies to,
 │                                  human-review flag, retired IDs
-└── wards/
-    └── WARD-001/                  one folder per ward, named by its permanent ID
-        ├── ward.md                the ward
+└── rules/
+    └── RULE-001/                  one folder per rule, named by its permanent ID
+        ├── rule.md                the rule
         └── examples/
             └── unbounded-list.md  a violating sample and the expected fix shape
 ```
 
-The first approved `/record-ward` creates the directory and adds that ward; warden never invents
-wards or copies them between repositories. IDs are permanent: merged or removed wards move to the
-index's Retired table, and their numbers are never reused. A `ward.md` looks like this (an
+The first approved `/record-rule` creates the directory and adds that rule; warden never invents
+rules or copies them between repositories. IDs are permanent: merged or removed rules move to the
+index's Retired table, and their numbers are never reused. A `rule.md` looks like this (an
 illustration, not something warden adds for you):
 
 ````markdown
@@ -129,7 +129,7 @@ paths:
   - 'src/**'
 ---
 
-# WARD-001: Avoid unnecessary abstractions
+# RULE-001: Avoid unnecessary abstractions
 
 **Description:** Every interface, factory or service layer the code adds serves a real need for a
 second implementation.
@@ -164,14 +164,14 @@ except contracts the framework requires.
 ````
 
 The `paths` frontmatter, the same format as Claude Code's `.claude/rules/` and Laravel Boost's
-`.ai/rules/`, scopes the ward to the files it governs. The checker matches it against the slice
-with `git diff -- ':(glob)…'`, so a ward whose paths match no changed file is N/A without anyone
-interpreting its text, and the index's Applies to column lets an agent find the wards for a file
-before it edits it. Leave `paths` out for a ward that applies everywhere. `source` and `decided`
-record who decided the ward and when, so an audit can tell a decision from an inference; add
-`until` for a temporary ward, and an audit will ask whether its time is up.
+`.ai/rules/`, scopes the rule to the files it governs. The checker matches it against the slice
+with `git diff -- ':(glob)…'`, so a rule whose paths match no changed file is N/A without anyone
+interpreting its text, and the index's Applies to column lets an agent find the rules for a file
+before it edits it. Leave `paths` out for a rule that applies everywhere. `source` and `decided`
+record who decided the rule and when, so an audit can tell a decision from an inference; add
+`until` for a temporary rule, and an audit will ask whether its time is up.
 
-When a test already checks a ward (an architecture test, say), list it under `enforced-by` and the
+When a test already checks a rule (an architecture test, say), list it under `enforced-by` and the
 checker runs it:
 
 ```yaml
@@ -179,7 +179,7 @@ enforced-by:
   - 'tests/Unit/Architecture/FormRequestsMustNotAbortTest.php'
 ```
 
-Add a `human-review` list to the frontmatter, one question per entry, for wards an agent can't
+Add a `human-review` list to the frontmatter, one question per entry, for rules an agent can't
 settle from code alone, such as product, UX or data-risk trade-offs:
 
 ```yaml
@@ -187,28 +187,28 @@ human-review:
   - 'Is the confirmation wording clear to a customer about exactly what will be lost?'
 ```
 
-Leave it out, like `paths`, when it doesn't apply. `/check-wards` still checks them, then lists them for you to
+Leave it out, like `paths`, when it doesn't apply. `/check-rules` still checks them, then lists them for you to
 decide once it reports.
 
 ### Examples and self-tests
 
-Each ward keeps one to three examples: a realistic violating **sample** and the **expected fix
+Each rule keeps one to three examples: a realistic violating **sample** and the **expected fix
 shape**, the requirements any correct fix meets plus one fix in code. They power a before/after
-self-test that `/record-ward` runs on every draft and `/audit-wards` runs on every ward:
+self-test that `/record-rule` runs on every draft and `/audit-rules` runs on every rule:
 
 | Example | Before (sample) | Expected fix | After (applied fix) | Matches fix shape |
 |---|---|---|---|---|
 | unbounded-list | FAIL ✓ | PASS ✓ | PASS ✓ | ✓ |
 
 The sample must fail, the expected fix must pass, and the sample with the checker's recommended
-correction applied must pass and match the fix shape. A ✗ points at a loose or ambiguous ward, or
+correction applied must pass and match the fix shape. A ✗ points at a loose or ambiguous rule, or
 a wrong example, before it gives flaky verdicts on real slices.
 
 Examples are deliberately bad code, so warden keeps them away from everything else:
 
-- `/check-wards` and the checker read only `ward.md`, never the examples.
-- Self-tests run in a separate `ward-tester` subagent, so example code never enters your
-  conversation, and an audit runs one tester per ward.
+- `/check-rules` and the checker read only `rule.md`, never the examples.
+- Self-tests run in a separate `rule-tester` subagent, so example code never enters your
+  conversation, and an audit runs one tester per rule.
 - Fresh checkers judge the code cases blind: shuffled, unlabeled, without the expected fix shape.
 - `.warden/.ignore` hides the `examples/` folders from ripgrep-based searches (including Claude
   Code's Grep), so agents searching your code don't trip over the samples.
@@ -221,17 +221,17 @@ The full format is in [`shared/registry-format.md`](shared/registry-format.md).
 warden/
 ├── .claude-plugin/            plugin manifest and single-plugin marketplace
 ├── skills/
-│   ├── record-ward/           /record-ward
-│   ├── audit-wards/           /audit-wards
-│   ├── check-wards/           /check-wards: scope, dispatch, fix loop, human review
+│   ├── record-rule/           /record-rule
+│   ├── audit-rules/           /audit-rules
+│   ├── check-rules/           /check-rules: scope, dispatch, fix loop, human review
 │   ├── create-verify-skill/   /create-verify-skill, with a worked feature-map example
 │   ├── verify-change/         /verify-change
 │   └── maintain-verify-skill/ /maintain-verify-skill
 ├── agents/
-│   ├── ward-checker.md        the independent, read-only checker
-│   └── ward-tester.md         the before/after self-test, isolated from your conversation
-├── shared/registry-format.md  registry location, templates, ward and example formats, IDs
-└── evals/                     claude plugin eval cases for the ward skills
+│   ├── rule-checker.md        the independent, read-only checker
+│   └── rule-tester.md         the before/after self-test, isolated from your conversation
+├── shared/registry-format.md  registry location, templates, rule and example formats, IDs
+└── evals/                     claude plugin eval cases for the rule skills
 ```
 
 ## Credits

@@ -1,0 +1,9 @@
+schema_version: "1.1"
+name: check-reports-every-rule
+expected_outcome: |
+  Dispatches the warden rule-checker; the report's summary table lists RULE-001 FAIL (unbounded
+  findMany in src/handlers/invoices.ts), RULE-002 PASS and RULE-003 N/A, each exactly once, with
+  totals and an overall FAIL, plus a finding that cites the file and line and recommends bounding
+  the query. Edits nothing and never opens the rule examples.
+context:
+  scaffold_script: scaffold.sh

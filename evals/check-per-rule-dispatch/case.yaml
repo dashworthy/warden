@@ -1,0 +1,10 @@
+schema_version: "1.1"
+name: check-per-rule-dispatch
+expected_outcome: |
+  With --per-rule, settles RULE-003 (paths `migrations/**`) as N/A with git and dispatches no checker
+  for it, then dispatches one rule-checker for RULE-001 and one for RULE-002, each prompt naming only
+  its own rule. Merges their rows into one report: RULE-001 FAIL (unbounded findMany in
+  src/handlers/invoices.ts), RULE-002 PASS, RULE-003 N/A, each exactly once, with totals, an overall
+  FAIL and an actionable finding. Edits nothing and never opens the rule examples.
+context:
+  scaffold_script: scaffold.sh

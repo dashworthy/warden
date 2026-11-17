@@ -1,0 +1,8 @@
+schema_version: "1.1"
+name: record-extends-existing-rule
+expected_outcome: |
+  Recognizes that RULE-001 (bound every query that can return many rows) already covers this
+  concern and recommends extending or reusing RULE-001 instead of creating a near-duplicate rule;
+  writes nothing without approval.
+context:
+  scaffold_script: scaffold.sh

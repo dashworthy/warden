@@ -6,4 +6,4 @@ min: 0
 max: 0
 arm: both
 ---
-WARD-002 requires human review, so src/ui/BulkDeleteInvoices.tsx is never rewritten.
+RULE-002 requires human review, so src/ui/BulkDeleteInvoices.tsx is never rewritten.

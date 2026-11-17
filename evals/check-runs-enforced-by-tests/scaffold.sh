@@ -62,10 +62,10 @@ test('handlers reach the database only through services', () => {
 __WARDEN_EOF__
 mkdir -p .warden
 cat > .warden/.ignore <<'__WARDEN_EOF__'
-wards/*/examples/
+rules/*/examples/
 __WARDEN_EOF__
-mkdir -p .warden/wards/WARD-001
-cat > .warden/wards/WARD-001/ward.md <<'__WARDEN_EOF__'
+mkdir -p .warden/rules/RULE-001
+cat > .warden/rules/RULE-001/rule.md <<'__WARDEN_EOF__'
 ---
 source: 'Team engineering review'
 decided: 2026-10-01
@@ -75,7 +75,7 @@ enforced-by:
   - 'tests/arch/handlers-use-services.test.mjs'
 ---
 
-# WARD-001: Reach the database from handlers only through services
+# RULE-001: Reach the database from handlers only through services
 
 **Description:** HTTP handlers that query the database directly mix transport concerns with data access and duplicate query logic.
 
@@ -113,8 +113,8 @@ export async function listOrders(req: { query: { accountId: string } }) {
 
 **Applicability:** HTTP handlers in `src/handlers/`.
 __WARDEN_EOF__
-mkdir -p .warden/wards/WARD-001/examples
-cat > .warden/wards/WARD-001/examples/refund-handler-queries-db.md <<'__WARDEN_EOF__'
+mkdir -p .warden/rules/RULE-001/examples
+cat > .warden/rules/RULE-001/examples/refund-handler-queries-db.md <<'__WARDEN_EOF__'
 # Refund handler queries the database
 
 ## Sample
@@ -142,8 +142,8 @@ export async function listRefunds(req: { query: { paymentId: string } }) {
 }
 ```
 __WARDEN_EOF__
-mkdir -p .warden/wards/WARD-002
-cat > .warden/wards/WARD-002/ward.md <<'__WARDEN_EOF__'
+mkdir -p .warden/rules/RULE-002
+cat > .warden/rules/RULE-002/rule.md <<'__WARDEN_EOF__'
 ---
 source: 'Team engineering review'
 decided: 2026-10-01
@@ -153,7 +153,7 @@ enforced-by:
   - 'tests/arch/handlers-validate-input.test.mjs'
 ---
 
-# WARD-002: Validate request input at the handler boundary
+# RULE-002: Validate request input at the handler boundary
 
 **Description:** Handlers that pass raw request input to services let malformed or hostile data deep into the system.
 
@@ -188,8 +188,8 @@ export async function createInvoice(req: Request) {
 
 **Applicability:** HTTP handlers in `src/handlers/`. Exception: handlers that read no request input.
 __WARDEN_EOF__
-mkdir -p .warden/wards/WARD-002/examples
-cat > .warden/wards/WARD-002/examples/raw-refund-body.md <<'__WARDEN_EOF__'
+mkdir -p .warden/rules/RULE-002/examples
+cat > .warden/rules/RULE-002/examples/raw-refund-body.md <<'__WARDEN_EOF__'
 # Refund created from the raw body
 
 ## Sample
@@ -216,23 +216,23 @@ export async function createRefund(req: { body: unknown }) {
 }
 ```
 __WARDEN_EOF__
-cat > .warden/wards.md <<'__WARDEN_EOF__'
-# Wards
+cat > .warden/rules.md <<'__WARDEN_EOF__'
+# Rules
 
-Engineering standards for this repository. Each ward is one enforceable standard with its own
-folder in `wards/`, checked against every implementation slice by an independent reviewer.
-Managed with the warden plugin: `/record-ward` adds a ward, `/audit-wards` consolidates them,
-`/check-wards` verifies a slice.
+Engineering standards for this repository. Each rule is one enforceable standard with its own
+folder in `rules/`, checked against every implementation slice by an independent reviewer.
+Managed with the warden plugin: `/record-rule` adds a rule, `/audit-rules` consolidates them,
+`/check-rules` verifies a slice.
 
-<!-- One Summary row per folder in wards/, in ID order. IDs are permanent: never renumber or
+<!-- One Summary row per folder in rules/, in ID order. IDs are permanent: never renumber or
      reuse one. Retired IDs stay listed under Retired. -->
 
 ## Summary
 
 | ID | Name | Applies to | Human review |
 |----|------|------------|--------------|
-| [WARD-001](wards/WARD-001/ward.md) | Reach the database from handlers only through services | `src/handlers/**` | No |
-| [WARD-002](wards/WARD-002/ward.md) | Validate request input at the handler boundary | `src/handlers/**` | No |
+| [RULE-001](rules/RULE-001/rule.md) | Reach the database from handlers only through services | `src/handlers/**` | No |
+| [RULE-002](rules/RULE-002/rule.md) | Validate request input at the handler boundary | `src/handlers/**` | No |
 
 ## Retired
 

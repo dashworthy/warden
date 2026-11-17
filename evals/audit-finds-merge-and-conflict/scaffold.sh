@@ -21,10 +21,10 @@ export { prisma as db } from './prisma'
 __WARDEN_EOF__
 mkdir -p .warden
 cat > .warden/.ignore <<'__WARDEN_EOF__'
-wards/*/examples/
+rules/*/examples/
 __WARDEN_EOF__
-mkdir -p .warden/wards/WARD-001
-cat > .warden/wards/WARD-001/ward.md <<'__WARDEN_EOF__'
+mkdir -p .warden/rules/RULE-001
+cat > .warden/rules/RULE-001/rule.md <<'__WARDEN_EOF__'
 ---
 source: 'Team engineering review'
 decided: 2026-10-01
@@ -32,7 +32,7 @@ paths:
   - 'src/**'
 ---
 
-# WARD-001: Bound every query that can return many rows
+# RULE-001: Bound every query that can return many rows
 
 **Description:** List and export queries that load every matching row exhaust memory and time out as data grows.
 
@@ -62,8 +62,8 @@ const orders = await db.order.findMany({ where: { accountId }, take: limit, skip
 
 **Applicability:** Code that queries collections of records. Exception: tables with a hard, documented size cap, such as enums.
 __WARDEN_EOF__
-mkdir -p .warden/wards/WARD-001/examples
-cat > .warden/wards/WARD-001/examples/overdue-payments-report.md <<'__WARDEN_EOF__'
+mkdir -p .warden/rules/RULE-001/examples
+cat > .warden/rules/RULE-001/examples/overdue-payments-report.md <<'__WARDEN_EOF__'
 # Overdue payments report
 
 ## Sample
@@ -97,8 +97,8 @@ export async function* overduePayments(now: Date) {
 }
 ```
 __WARDEN_EOF__
-mkdir -p .warden/wards/WARD-002
-cat > .warden/wards/WARD-002/ward.md <<'__WARDEN_EOF__'
+mkdir -p .warden/rules/RULE-002
+cat > .warden/rules/RULE-002/rule.md <<'__WARDEN_EOF__'
 ---
 source: 'Team engineering review'
 decided: 2026-10-01
@@ -106,7 +106,7 @@ paths:
   - 'src/handlers/**'
 ---
 
-# WARD-002: Paginate every list endpoint
+# RULE-002: Paginate every list endpoint
 
 **Description:** List endpoints must return pages (a limit and a cursor) instead of every record.
 
@@ -139,8 +139,8 @@ export async function listOrders(req: Request) {
 
 **Applicability:** HTTP handlers that return collections.
 __WARDEN_EOF__
-mkdir -p .warden/wards/WARD-002/examples
-cat > .warden/wards/WARD-002/examples/unpaginated-search.md <<'__WARDEN_EOF__'
+mkdir -p .warden/rules/RULE-002/examples
+cat > .warden/rules/RULE-002/examples/unpaginated-search.md <<'__WARDEN_EOF__'
 # Customer search returns everything
 
 ## Sample
@@ -171,14 +171,14 @@ export async function searchCustomers(req: { query: unknown }) {
 }
 ```
 __WARDEN_EOF__
-mkdir -p .warden/wards/WARD-003
-cat > .warden/wards/WARD-003/ward.md <<'__WARDEN_EOF__'
+mkdir -p .warden/rules/RULE-003
+cat > .warden/rules/RULE-003/rule.md <<'__WARDEN_EOF__'
 ---
 source: 'Team engineering review'
 decided: 2026-10-01
 ---
 
-# WARD-003: Retry every external API call
+# RULE-003: Retry every external API call
 
 **Description:** Calls to external HTTP APIs fail transiently and must be retried.
 
@@ -206,8 +206,8 @@ const res = await retryWithBackoff(() => fetch(`${PAYMENTS_URL}/charges`, { meth
 
 **Applicability:** Every call to an external HTTP API.
 __WARDEN_EOF__
-mkdir -p .warden/wards/WARD-003/examples
-cat > .warden/wards/WARD-003/examples/bare-shipping-call.md <<'__WARDEN_EOF__'
+mkdir -p .warden/rules/RULE-003/examples
+cat > .warden/rules/RULE-003/examples/bare-shipping-call.md <<'__WARDEN_EOF__'
 # Shipping rates call without retry
 
 ## Sample
@@ -233,14 +233,14 @@ export async function fetchRates(parcel: Parcel) {
 }
 ```
 __WARDEN_EOF__
-mkdir -p .warden/wards/WARD-004
-cat > .warden/wards/WARD-004/ward.md <<'__WARDEN_EOF__'
+mkdir -p .warden/rules/RULE-004
+cat > .warden/rules/RULE-004/rule.md <<'__WARDEN_EOF__'
 ---
 source: 'Team engineering review'
 decided: 2026-10-01
 ---
 
-# WARD-004: Never retry non-idempotent requests
+# RULE-004: Never retry non-idempotent requests
 
 **Description:** Requests that create or change state must not be retried automatically unless they carry an idempotency key.
 
@@ -270,8 +270,8 @@ await retryWithBackoff(() =>
 
 **Applicability:** Code that retries HTTP requests.
 __WARDEN_EOF__
-mkdir -p .warden/wards/WARD-004/examples
-cat > .warden/wards/WARD-004/examples/retried-capture.md <<'__WARDEN_EOF__'
+mkdir -p .warden/rules/RULE-004/examples
+cat > .warden/rules/RULE-004/examples/retried-capture.md <<'__WARDEN_EOF__'
 # Payment capture retried without a key
 
 ## Sample
@@ -298,31 +298,31 @@ export async function capture(chargeId: string) {
 ```
 __WARDEN_EOF__
 mkdir -p .warden
-cat > .warden/wards.md <<'__WARDEN_EOF__'
-# Wards
+cat > .warden/rules.md <<'__WARDEN_EOF__'
+# Rules
 
-Engineering standards for this repository. Each ward is one enforceable standard with its own
-folder in `wards/`, checked against every implementation slice by an independent reviewer.
-Managed with the warden plugin: `/record-ward` adds a ward, `/audit-wards` consolidates them,
-`/check-wards` verifies a slice.
+Engineering standards for this repository. Each rule is one enforceable standard with its own
+folder in `rules/`, checked against every implementation slice by an independent reviewer.
+Managed with the warden plugin: `/record-rule` adds a rule, `/audit-rules` consolidates them,
+`/check-rules` verifies a slice.
 
-<!-- One Summary row per folder in wards/, in ID order. IDs are permanent: never renumber or
+<!-- One Summary row per folder in rules/, in ID order. IDs are permanent: never renumber or
      reuse one. Retired IDs stay listed under Retired. -->
 
 ## Summary
 
 | ID | Name | Applies to | Human review |
 |----|------|------------|--------------|
-| [WARD-001](wards/WARD-001/ward.md) | Bound every query that can return many rows | `src/**` | No |
-| [WARD-002](wards/WARD-002/ward.md) | Paginate every list endpoint | `src/handlers/**` | No |
-| [WARD-003](wards/WARD-003/ward.md) | Retry every external API call | All | No |
-| [WARD-004](wards/WARD-004/ward.md) | Never retry non-idempotent requests | All | No |
+| [RULE-001](rules/RULE-001/rule.md) | Bound every query that can return many rows | `src/**` | No |
+| [RULE-002](rules/RULE-002/rule.md) | Paginate every list endpoint | `src/handlers/**` | No |
+| [RULE-003](rules/RULE-003/rule.md) | Retry every external API call | All | No |
+| [RULE-004](rules/RULE-004/rule.md) | Never retry non-idempotent requests | All | No |
 
 ## Retired
 
 | ID | Former name | Outcome |
 |----|-------------|---------|
-| WARD-005 | Use snake_case table names | Removed: enforced by the migration linter |
+| RULE-005 | Use snake_case table names | Removed: enforced by the migration linter |
 __WARDEN_EOF__
 mkdir -p src/handlers
 cat > src/handlers/health.ts <<'__WARDEN_EOF__'
