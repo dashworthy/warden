@@ -1,8 +1,8 @@
 ---
-tags: [warden, check-wards]
+tags: [warden, check-rules]
 max_turns: 30
 timeout_seconds: 900
 allowed_tools: [Read, Glob, Grep, Bash, Skill, Agent, Write, Edit]
 ---
 
-/check-wards on my current changes
+/check-rules on my current changes

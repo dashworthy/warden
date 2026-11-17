@@ -46,18 +46,18 @@ export const routes = {
 __WARDEN_EOF__
 mkdir -p .warden
 cat > .warden/.ignore <<'__WARDEN_EOF__'
-wards/*/examples/
+rules/*/examples/
 __WARDEN_EOF__
 mkdir -p .warden
-cat > .warden/wards.md <<'__WARDEN_EOF__'
-# Wards
+cat > .warden/rules.md <<'__WARDEN_EOF__'
+# Rules
 
-Engineering standards for this repository. Each ward is one enforceable standard with its own
-folder in `wards/`, checked against every implementation slice by an independent reviewer.
-Managed with the warden plugin: `/record-ward` adds a ward, `/audit-wards` consolidates them,
-`/check-wards` verifies a slice.
+Engineering standards for this repository. Each rule is one enforceable standard with its own
+folder in `rules/`, checked against every implementation slice by an independent reviewer.
+Managed with the warden plugin: `/record-rule` adds a rule, `/audit-rules` consolidates them,
+`/check-rules` verifies a slice.
 
-<!-- One Summary row per folder in wards/, in ID order. IDs are permanent: never renumber or
+<!-- One Summary row per folder in rules/, in ID order. IDs are permanent: never renumber or
      reuse one. Retired IDs stay listed under Retired. -->
 
 ## Summary
