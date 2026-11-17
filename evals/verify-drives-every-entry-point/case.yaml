@@ -1,9 +1,9 @@
 schema_version: "1.1"
 name: verify-drives-every-entry-point
 expected_outcome: |
-  The change trims titles in store.js, which both the HTTP API and the CLI use. The verify skill maps
-  add-todo to both entry points, so the run launches the app per the skill and adds a todo with
-  surrounding spaces through POST /todos and through node cli.js add, reads both back, cleans up, and
+  The change trims titles in store.js, which both entry points the verify skill maps for add-todo use:
+  node cli.js add and node cli.js import. The run uses an isolated store per the skill, adds titles
+  with surrounding spaces through both commands, reads them back with list --json, cleans up, and
   reports a verdict for each entry point with its evidence.
 context:
   scaffold_script: scaffold.sh

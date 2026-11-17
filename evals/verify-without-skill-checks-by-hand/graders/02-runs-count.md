@@ -1,7 +1,7 @@
 ---
 type: tool_used
 tool: Bash
-input_match: 'node\s+(?:\./)?cli\.js\s+count'
+input_match: 'cli\.js\S*\s+count'
 min: 1
 arm: both
 ---
