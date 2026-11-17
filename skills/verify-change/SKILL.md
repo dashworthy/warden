@@ -42,7 +42,7 @@ Never weaken a check to make it pass. A precondition you can't meet is a failure
 
 ## 4. Report
 
-Lead with the verdict per check: **pass**, **fail**, or **inconclusive** (the check couldn't run, and why). Then for each check:
+Lead with the verdict per check, using exactly one of these words: **pass**, **fail**, or **inconclusive** (the check couldn't run, and why). Don't swap in other words like "couldn't run" or "skipped": a reader scanning for inconclusive must find it. Then for each check:
 
 - The exact command or user path driven.
 - The observed output or state.

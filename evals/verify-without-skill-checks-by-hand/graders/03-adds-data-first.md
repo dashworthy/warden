@@ -1,7 +1,7 @@
 ---
 type: tool_used
 tool: Bash
-input_match: 'node\s+(?:\./)?cli\.js\s+add|curl[^\n]*-X\s*POST'
+input_match: 'cli\.js\S*\s+(?:add|import)'
 min: 1
 arm: both
 ---

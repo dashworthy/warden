@@ -40,6 +40,8 @@ Write `.claude/skills/verify-<app>/SKILL.md` with YAML frontmatter: `name: verif
 - **Cleanup:** how to tear down what the run created. Never kill by process name; kill what you started. Cleanup removes instances and scratch state, never the evidence: proof artifacts survive the teardown, at the location the skill names.
 - **Helpers:** any script the skill ships lives in the skill's `scripts/` folder, is executable, and has its invocation shown in the skill body. A helper the reader has to reverse-engineer is not a helper.
 
+If writing to `.claude/skills/` is blocked (a sandbox or permission denial), build the skill at the same relative path in a scratch copy of the repo, prove it there, and hand over the exact copy command. Never skip the proof because the final location is blocked.
+
 ## 3. Seed the feature map
 
 Create `.claude/skills/verify-<app>/features/README.md` plus one file per user-facing feature you can identify. Aim for the top 3–5 to start, from routes, commands, menus or docs. Follow the shape in [`references/feature-map-example/`](references/feature-map-example/): a README index (baseline preconditions, driving conventions, proof and skip reporting, the entry contract, the feature list) and one file per feature.

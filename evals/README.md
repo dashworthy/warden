@@ -36,12 +36,15 @@ against a no-plugin baseline, so every number says what warden adds over plain C
 
 **`/create-verify-skill`**
 
-The verification cases scaffold `tally`, a dependency-free Node todo app with a JSON API and a CLI,
-on a random port so parallel runs never share a server. The app really starts: these cases drive it.
+The verification cases scaffold `tally`, a dependency-free Node todo CLI with two ways to add todos
+(`add` and `import <file>`) sharing one store. These cases really run it. It has no server because the
+eval sandbox doesn't allow binding local ports, and the sandbox also write-protects `.claude/`, so
+`create-writes-and-proves-skill` accepts a skill built and proved in a scratch copy with a copy command
+handed over.
 
 | Case | Measures |
 |---|---|
-| `create-writes-and-proves-skill` | Writes `.claude/skills/verify-<app>/SKILL.md` (frontmatter; Launch, Doctor, Drive, Evidence, Cleanup from the repo's real commands), `features/README.md` and feature files with the four headings, then launches and drives the app once, cleans up, and confirms the evidence survived. Never edits the app. |
+| `create-writes-and-proves-skill` | Writes a verify skill (frontmatter; Launch, Doctor, Drive, Evidence, Cleanup from the repo's real commands), `features/README.md` and feature files with the four headings, then drives the CLI once against an isolated store, cleans up, and confirms the evidence survived. Never edits the app. |
 | `create-defers-to-maintain` | A verify skill already exists: writes and edits nothing, and points to `/maintain-verify-skill`. |
 
 **`/verify-change`**
@@ -50,13 +53,13 @@ on a random port so parallel runs never share a server. The app really starts: t
 |---|---|
 | `verify-without-skill-checks-by-hand` | With no verify skill, a plain-language request still fires the skill, runs the real `count` command against data it added, reports the commands and output, and mentions `/create-verify-skill` without creating one. |
 | `verify-unmet-precondition-is-inconclusive` | The new `sync` command needs a token that isn't available: the verdict is inconclusive with the missing token named, never a pass, and product code is untouched. |
-| `verify-drives-every-entry-point` | A change in shared code reaches both mapped entry points: drives `POST /todos` and `node cli.js add`, stops the server it started, and reports each with evidence. |
+| `verify-drives-every-entry-point` | A change in shared code reaches both mapped entry points: drives `add` and `import` against an isolated store, reads each back, and reports both with evidence. Plain Claude also passes it today, so it guards against regressions rather than measuring lift. |
 
 **`/maintain-verify-skill`**
 
 | Case | Measures |
 |---|---|
-| `maintain-reports-product-bug-not-map` | A recent commit broke adding a todo. Runs the source wave with subagents and a live pass, reports the failure as a product bug, and edits neither the product code nor the (correct) map entry. |
+| `maintain-reports-product-bug-not-map` | A recent commit broke adding a todo. Reads every feature from source and drives every feature live, reports the failure as a product bug, and edits neither the product code nor the (correct) map entry. |
 | `maintain-no-target-stops` | No verify skill: no subagents, no writes, and a pointer to `/create-verify-skill`. |
 
 ## How scoring is wired
@@ -73,4 +76,4 @@ on a random port so parallel runs never share a server. The app really starts: t
 claude plugin eval . --scaffold --allow-tools Write,Edit,Bash --runs 1 -j 4
 ```
 
-`--scaffold` runs each case's `scaffold.sh`; without it every case starts in an empty directory and fails. The verification cases need `node` and `curl` on `PATH`. Results land in `evals/results/` (git-ignored).
+`--scaffold` runs each case's `scaffold.sh`; without it every case starts in an empty directory and fails. The verification cases need `node` on `PATH`. Results land in `evals/results/` (git-ignored).
