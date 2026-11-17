@@ -2,31 +2,18 @@
 
 # warden
 
-A Claude Code plugin that keeps your repository's own engineering standards and enforces them at
-each phase of the work: on plans, on every implementation slice, and on pull requests. Each standard is a **ward**: one enforceable rule with examples and a
+A Claude Code plugin that keeps your repository's own engineering standards and enforces them on
+every implementation slice. Each standard is a **ward**: one enforceable rule with examples and a
 verification procedure, kept in a registry your repository owns.
 
 | Skill | Does |
 |---|---|
 | `/record-ward` | Turns an instruction, PR comment or review finding into a ward. Checks for overlap, drafts examples and a verification procedure, self-tests the draft, and writes only after you approve. |
 | `/audit-wards` | Self-tests every ward and reviews the registry for overlap, conflicts, ambiguity, overreach and length, then proposes merges that name the IDs retained and retired. Writes only what you approve. |
-| `/check-wards` | Verifies a plan, a slice or a PR against that phase's wards through an independent, read-only checker: PASS, FAIL, N/A or UNVERIFIED for each ward, actionable findings, and the items that need your review. |
+| `/check-wards` | Verifies a slice against every ward through an independent, read-only checker: PASS, FAIL, N/A or UNVERIFIED for each ward, actionable findings, and the items that need your review. |
 
-Linters check syntax and style. Wards cover what they can't: architecture, engineering standards,
-implementation quality, and how plans and pull requests are written.
-
-## Phases
-
-Each ward belongs to a phase, set with `phases:` in its frontmatter (`code` when left out):
-
-| Phase | Check with | Reads | Example ward |
-|---|---|---|---|
-| `design` | `/check-wards --phase design docs/plans/x.md` | a plan or design document | Every plan states how the change is rolled back |
-| `code` | `/check-wards` | the diff | Bound every query that can return many rows |
-| `pr` | `/check-wards --phase pr` | the PR's title, body, labels, commits and diff stats | Every PR body links its issue |
-
-A check reports only its phase's wards. In the `pr` phase, `--fix` never edits the PR or rewrites
-commits: it brings those corrections to you.
+Linters check syntax and style. Wards cover what they can't: architecture, engineering standards
+and implementation quality.
 
 ## How a check works
 
@@ -63,8 +50,6 @@ commits: it brings those corrections to you.
 /audit-wards
 /check-wards
 /check-wards --fix main..HEAD
-/check-wards --phase design docs/plans/invoices.md
-/check-wards --phase pr
 /check-wards --per-ward
 ```
 
@@ -77,12 +62,9 @@ Paste into the project's `CLAUDE.md` or `AGENTS.md`:
 - Before planning or editing a file, open `.warden/wards.md` and read every ward whose Applies to
   matches the file's path (`All` matches every path). Then grep `.warden/wards` for the feature's
   key terms to catch wards a path match misses. Follow them as you write the code.
-- Before implementing a plan, run `/check-wards --phase design <plan file>` and revise the plan
-  until it passes.
 - After each implementation slice, run `/check-wards` (`--fix` applies fixes that don't need human review).
 - Fix every FAIL and UNVERIFIED finding, then run `/check-wards` again until it reports PASS.
 - Bring me any human-review items, then stop for my approval before starting the next slice.
-- Before opening a pull request, run `/check-wards --phase pr` with the draft title and body.
 ```
 
 ## The registry
@@ -92,8 +74,8 @@ Each repository keeps its wards in `.warden/`, which you commit with your code:
 ```
 .warden/
 ├── .ignore                        keeps examples out of code searches
-├── wards.md                       index: every ward (linked), its phases, the paths it
-│                                  applies to, human-review flag, retired IDs
+├── wards.md                       index: every ward (linked), the paths it applies to,
+│                                  human-review flag, retired IDs
 └── wards/
     └── WARD-001/                  one folder per ward, named by its permanent ID
         ├── ward.md                the ward
