@@ -1,16 +1,21 @@
-![warden — Record, audit and enforce your engineering standards.](art/banner.svg)
+![warden — Enforce your standards and prove every change in the app.](art/banner.svg)
 
 # warden
 
-A Claude Code plugin that keeps your repository's own engineering standards and enforces them on
-every implementation slice. Each standard is a **ward**: one enforceable rule with examples and a
-verification procedure, kept in a registry your repository owns.
+A Claude Code plugin that keeps your repository's own engineering standards, enforces them on
+every implementation slice, and proves each change works in the running app. Each standard is a
+**ward**: one enforceable rule with examples and a verification procedure, kept in a registry your
+repository owns. Each proof runs through a **verify skill**: a project-local recipe for launching
+and driving your app, with a map of its features.
 
 | Skill | Does |
 |---|---|
 | `/record-ward` | Turns an instruction, PR comment or review finding into a ward. Checks for overlap, drafts examples and a verification procedure, self-tests the draft, and writes only after you approve. |
 | `/audit-wards` | Self-tests every ward and reviews the registry for overlap, conflicts, ambiguity, overreach and length, then proposes merges that name the IDs retained and retired. Writes only what you approve. |
 | `/check-wards` | Verifies a slice against every ward through an independent, read-only checker: PASS, FAIL, N/A or UNVERIFIED for each ward, actionable findings, and the items that need your review. |
+| `/create-verify-skill` | Reads the repo and writes `.claude/skills/verify-<app>/`: exact Launch, Doctor, Drive, Evidence and Cleanup sections, plus a feature map. Proves the generated skill once end to end before handing it over. |
+| `/verify-change` | States a falsifiable finish condition, drives every mapped feature the change reaches in the running app, and reports pass, fail or inconclusive with commands and evidence paths. Claude also loads it on its own before calling a change done. |
+| `/maintain-verify-skill` | Keeps the verify skill honest: one read-only source reader per feature, one live pass driving every feature, then `clean`, `changed` (one PR of proven map fixes) or `blocked`. Never edits product code. |
 
 Linters check syntax and style. Wards cover what they can't: architecture, engineering standards
 and implementation quality.
@@ -36,6 +41,28 @@ and implementation quality.
   report. Each ward gets a checker's full attention, at one checker run per ward; wards whose
   `paths` match nothing are N/A without one.
 
+## How verification works
+
+Wards check the code. Verification checks the app: "it compiles" is not evidence.
+
+```
+/create-verify-skill ──▶ .claude/skills/verify-<app>/       (commit it)
+                           SKILL.md   Launch · Doctor · Drive · Evidence · Cleanup · Helpers
+                           features/  README.md + one file per user-facing feature
+                                │
+       every change ──────▶ /verify-change ─────────▶ pass | fail | inconclusive + evidence
+                                │
+       app drifts ────────▶ /maintain-verify-skill ─▶ clean | changed (1 PR) | blocked
+```
+
+- Each feature file lists every way a user reaches the feature, how to drive it, and the
+  observable end state that proves it works. A proof through one convenient entry point doesn't
+  cover the others.
+- Evidence (screenshots, ARIA snapshots, transcripts, read-back values, side effects) lands in a
+  location the verify skill names and survives cleanup.
+- A check that can't run is **inconclusive**, never a pass, and a journey is never weakened to
+  make it pass.
+
 ## Install
 
 ```
@@ -51,6 +78,9 @@ and implementation quality.
 /check-wards
 /check-wards --fix main..HEAD
 /check-wards --per-ward
+/create-verify-skill
+/verify-change the bulk-archive action; show screenshots as proof
+/maintain-verify-skill
 ```
 
 ## Add it to your workflow
@@ -65,6 +95,9 @@ Paste into the project's `CLAUDE.md` or `AGENTS.md`:
 - After each implementation slice, run `/check-wards` (`--fix` applies fixes that don't need human review).
 - Fix every FAIL and UNVERIFIED finding, then run `/check-wards` again until it reports PASS.
 - Bring me any human-review items, then stop for my approval before starting the next slice.
+
+## Verification
+- Before calling a change done, run `/verify-change` and show the evidence. Inconclusive is not done.
 ```
 
 ## The registry
@@ -190,15 +223,22 @@ warden/
 ├── skills/
 │   ├── record-ward/           /record-ward
 │   ├── audit-wards/           /audit-wards
-│   └── check-wards/           /check-wards: scope, dispatch, fix loop, human review
+│   ├── check-wards/           /check-wards: scope, dispatch, fix loop, human review
+│   ├── create-verify-skill/   /create-verify-skill, with a worked feature-map example
+│   ├── verify-change/         /verify-change
+│   └── maintain-verify-skill/ /maintain-verify-skill
 ├── agents/
 │   ├── ward-checker.md        the independent, read-only checker
 │   └── ward-tester.md         the before/after self-test, isolated from your conversation
 ├── shared/registry-format.md  registry location, templates, ward and example formats, IDs
-└── evals/                     claude plugin eval cases for all three skills
+└── evals/                     claude plugin eval cases for the ward skills
 ```
 
 ## Credits
+
+The verification skills are adapted from [pstack](https://github.com/cursor/plugins/tree/main/pstack)
+by Lauren Tan (MIT): `create-verification-skill`, `maintain-verification-skill`, the prove-it-works
+principle and the verify-and-ship guide, rewritten for Claude Code.
 
 Banner helmet: [Warlord helmet](https://game-icons.net/1x1/caro-asercion/warlord-helmet.html) by
 caro-asercion, from [game-icons.net](https://game-icons.net), licensed

@@ -11,8 +11,8 @@
     {
       "name": "warden",
       "source": "./",
-      "description": "Record, audit and enforce your repository's own engineering standards (wards), with an independent read-only checker for every slice.",
-      "version": "0.7.0",
+      "description": "Record, audit and enforce your repository's own engineering standards (wards), with an independent read-only checker for every slice, and prove every change in the running app through a project verify skill.",
+      "version": "0.8.0",
       "author": {
         "name": "Andrew Leach",
         "email": "7387639+andyleach@users.noreply.github.com"
