@@ -1,0 +1,7 @@
+schema_version: "1.1"
+name: maintain-no-target-stops
+expected_outcome: |
+  The repo has no verify skill. The run stops without inventing one, writes and edits nothing, and
+  points the user at /create-verify-skill.
+context:
+  scaffold_script: scaffold.sh
