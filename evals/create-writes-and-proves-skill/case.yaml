@@ -1,0 +1,11 @@
+schema_version: "1.1"
+name: create-writes-and-proves-skill
+expected_outcome: |
+  Reads the tally repo, writes .claude/skills/verify-tally/ (or another verify-<app> name) with
+  frontmatter and Launch, Doctor, Drive, Evidence and Cleanup sections built from the real commands
+  (node cli.js add, import and list, DATA_DIR), seeds features/README.md plus at least one feature
+  file with the four required headings, then runs the generated skill once: sets up an isolated store,
+  runs the doctor, drives one feature, captures evidence, cleans up and confirms the evidence
+  survived. Never edits the app.
+context:
+  scaffold_script: scaffold.sh

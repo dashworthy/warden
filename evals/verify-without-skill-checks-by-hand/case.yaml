@@ -1,0 +1,8 @@
+schema_version: "1.1"
+name: verify-without-skill-checks-by-hand
+expected_outcome: |
+  There is no verify skill. The run still proves the new count command by running the real CLI (node
+  cli.js count) against real data, reports the commands and their output with a verdict, mentions
+  /create-verify-skill once as a way to make this repeatable, and does not create a verify skill.
+context:
+  scaffold_script: scaffold.sh
