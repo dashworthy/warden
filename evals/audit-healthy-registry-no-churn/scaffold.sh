@@ -34,7 +34,7 @@ paths:
 
 # WARD-001: Bound every query that can return many rows
 
-**Description:** List and export queries that load every matching row exhaust memory and time out as data grows.
+**Description:** Every query that can return many rows has a limit.
 
 **Rationale:** One large customer turns an unbounded query into a multi-second response or an out-of-memory crash, usually in production first.
 
@@ -108,7 +108,7 @@ paths:
 
 # WARD-002: Make every migration reversible
 
-**Description:** Migrations without a working `down` step can't be rolled back during an incident.
+**Description:** Every migration has a `down` that undoes its `up`.
 
 **Rationale:** A bad deploy with an irreversible migration turns a rollback into manual data repair.
 
@@ -181,10 +181,10 @@ Managed with the warden plugin: `/record-ward` adds a ward, `/audit-wards` conso
 
 ## Summary
 
-| ID | Name | Phases | Applies to | Human review |
-|----|------|--------|------------|--------------|
-| [WARD-001](wards/WARD-001/ward.md) | Bound every query that can return many rows | code | `src/**` | No |
-| [WARD-002](wards/WARD-002/ward.md) | Make every migration reversible | code | `migrations/**` | No |
+| ID | Name | Applies to | Human review |
+|----|------|------------|--------------|
+| [WARD-001](wards/WARD-001/ward.md) | Bound every query that can return many rows | `src/**` | No |
+| [WARD-002](wards/WARD-002/ward.md) | Make every migration reversible | `migrations/**` | No |
 
 ## Retired
 
